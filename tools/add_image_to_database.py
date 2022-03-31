@@ -5,8 +5,9 @@ import sqlite3
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# sys.path.insert(0, str(BASE_DIR.absolute()))
+sys.path.insert(0, str(BASE_DIR.absolute()))
 
+from imageObjects.models import Image
 
 def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image_object_path):
     # Preparing SQL queries to INSERT a record into the database.
@@ -14,6 +15,12 @@ def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image
               '("%s", "%s","%s", "%s", 0, 0)'%(image_name,image_path, image_bound_path, image_object_path)
     print(sql_str)
     cursor.execute(sql_str)
+
+def insert_one_image_record_django(image_name,image_path,image_bound_path, image_object_path):
+    img = Image(image_name=image_name,image_path=image_path,image_bound_path=image_bound_path,
+                image_object_path=image_object_path,concurrent_count=0,image_valid_times=0)
+    print(img.id, img.image_name)
+    img.save()
 
 def read_image_list():
     img_list_txt = os.path.join(BASE_DIR,'data','imageList.txt')
@@ -33,6 +40,14 @@ def read_image_list():
 
     return image_names,image_paths,image_Bound,image_object_paths
 
+def test_insert_one_image_record_django():
+
+    # need to set django environment (not sure how), like what in manage.py
+    image_name = 'example_111'
+    image_path = 'example.png'
+    image_bound_path = 'example_bound.geojson'
+    image_object_path = 'example_objects.geojson'
+    insert_one_image_record_django(image_name, image_path, image_bound_path, image_object_path)
 
 def main():
 
@@ -58,4 +73,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
+    # test_insert_one_image_record_django()

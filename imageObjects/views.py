@@ -19,12 +19,26 @@ def getItemOfImageObject(request):
     image_info = {'image_name': None,
                   'image_center_latlon': None}
 
-    # get the first available image_name (haven't been validated, less than 1 person is working on that)
+    # get the first available image_name (haven't been fully validated (<input's from the users))
     avail_image_name = get_available_image()
-    if avail_image_name is None:
-        pass
+    if avail_image_name is not None:
+        image_info['image_name'] = avail_image_name
+        image_info['image_center_latlon'] = "latlonTobefilled"
 
-    return HttpResponse('getItemOfImageObject at %s'%str(datetime.now()))
+    return JsonResponse(image_info)
+
+def getItemOfImageObject_user(request,user_name):
+    ''' get one available item: image, and return image_name '''
+    image_info = {'image_name': None,
+                  'image_center_latlon': None}
+
+    # get the first available image_name (haven't been fully validated (<input's from the users))
+    avail_image_name = get_available_image(user_name=user_name)
+    if avail_image_name is not None:
+        image_info['image_name'] = avail_image_name
+        image_info['image_center_latlon'] = "latlonTobefilled"
+
+    return JsonResponse(image_info)
 
 def getImageFile(request,image_name):
     '''get the PNG file for an image '''

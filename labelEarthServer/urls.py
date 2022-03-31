@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('imageObjects/',include('imageObjects.urls')),
     path('admin/', admin.site.urls),
+    path('debug/', include('debug_toolbar.urls')),
 ]
