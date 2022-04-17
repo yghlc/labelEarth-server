@@ -7,12 +7,13 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR.absolute()))
 
-from imageObjects.models import Image
+# from imageObjects.models import Image    ## need setting of INSTALLED_APPS
+from tools.vectorData_io import get_centroid_imagebound_latlon
 
-def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image_object_path):
+def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image_object_path, cen_lat, cen_lon):
     # Preparing SQL queries to INSERT a record into the database.
-    sql_str = 'INSERT INTO IMAGEOBJECTS_IMAGE(IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT , IMAGE_VALID_TIMES ) VALUES ' \
-              '("%s", "%s","%s", "%s", 0, 0)'%(image_name,image_path, image_bound_path, image_object_path)
+    sql_str = 'INSERT INTO IMAGEOBJECTS_IMAGE(IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT , IMAGE_VALID_TIMES ,IMAGE_CEN_LAT, IMAGE_CEN_LON) VALUES ' \
+              '("%s", "%s","%s", "%s", 0, 0, "%f", "%f")'%(image_name,image_path, image_bound_path, image_object_path,cen_lat, cen_lon)
     print(sql_str)
     cursor.execute(sql_str)
 
@@ -43,6 +44,8 @@ def read_image_list():
 def test_insert_one_image_record_django():
 
     # need to set django environment (not sure how), like what in manage.py
+    # django.core.exceptions.ImproperlyConfigured: Requested setting INSTALLED_APPS, but settings are not configured.
+    # You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.
     image_name = 'example_111'
     image_path = 'example.png'
     image_bound_path = 'example_bound.geojson'
@@ -62,7 +65,9 @@ def main():
     cursor = conn.cursor()
 
     for image_name,image_path, image_bound, image_object_path in zip(image_names,image_paths,image_Bounds,image_object_paths):
-        insert_one_image_record(cursor, image_name, image_path, image_bound,image_object_path)
+        center = get_centroid_imagebound_latlon(image_bound)
+        cen_lat, cen_lon = center.y, center.x
+        insert_one_image_record(cursor, image_name, image_path, image_bound,image_object_path,cen_lat, cen_lon)
 
     # Commit your changes in the database
     conn.commit()

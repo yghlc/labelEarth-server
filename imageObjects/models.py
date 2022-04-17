@@ -5,15 +5,6 @@ from django.contrib.auth.models import User
 # Create your models here.
 # A model is the single, definitive source of information about your data.
 
-# class User(models.Model):
-#     # if not set "'userID', "user_id" is the field's name
-#     user_id = models.UUIDField('user_id')    # user ID
-#     user_name = models.CharField('user_name',max_length=200)
-#     user_email = models.EmailField('user_email')
-#
-#     def __str__(self):
-#         return self.user_name
-
 class Image(models.Model):
     image_name = models.CharField(max_length=200,unique=True)
     image_path = models.FilePathField()
@@ -25,6 +16,10 @@ class Image(models.Model):
     concurrent_count = models.IntegerField(default=0)
 
     image_valid_times = models.IntegerField(default=0)
+
+    # center lat and lon
+    image_cen_lat = models.FloatField(default=None)
+    image_cen_lon = models.FloatField(default=None)
 
     def __str__(self):
         return self.image_name
