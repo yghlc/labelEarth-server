@@ -23,10 +23,10 @@ def get_available_image(user_name=None):
             filter(concurrent_count__lte=max_valid_times).order_by('image_name')  #
     else:
         user_name_id = User.objects.get(username=user_name).id  # username is unqiue
-        print('\n user_name_id:',user_name_id)
+        # print('\n user_name_id:',user_name_id)
         query_user = UserInput.objects.filter(user_name_id = user_name_id)
         checked_image_ids = [item.image_name_id for item in query_user]
-        print('\n checked_image_ids \n',checked_image_ids)
+        # print('\n checked_image_ids \n',checked_image_ids)
         query = Image.objects.filter(image_valid_times__lte=max_valid_times). \
             filter(concurrent_count__lte=max_valid_times).\
             exclude(id__in=checked_image_ids).order_by('image_name')  # id__not_in not works, use exclude
