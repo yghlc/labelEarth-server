@@ -10,6 +10,10 @@ from tools.common import get_available_image
 from datetime import datetime
 import json
 
+import logging
+# for this one, __name__ is "imageObjects.views"  (set this logger in "setting")
+logger = logging.getLogger(__name__)
+
 # Create your views here.
 def index(request):
     return HttpResponse('Hello, please use additional terms to get or send data! -Lingcao')
@@ -34,6 +38,7 @@ def getItemOfImageObject_user(request,user_name):
         image_info['image_center_lat'] = one_record.image_cen_lat
         image_info['image_center_lon'] = one_record.image_cen_lon
 
+    logger.info('user: %s request an image'%str(user_name))
     return JsonResponse(image_info)
 
 def getImageFile(request,image_name):
@@ -41,6 +46,7 @@ def getImageFile(request,image_name):
     one_record, b_success = get_one_record(image_name)    #
     if b_success is False:
         return one_record
+    logger.info('request the image file for %s' % image_name)
     return FileResponse(open(one_record.image_path, 'rb'))
 
 def getImageBound(request,image_name):
@@ -50,6 +56,7 @@ def getImageBound(request,image_name):
         return one_record
     with open(one_record.image_bound_path) as f_obj:
         data = json.load(f_obj)
+    logger.info('request the Image Bound geojson for %s' % image_name)
     return JsonResponse(data)
 
 def getImageObjects(request,image_name):
@@ -59,4 +66,5 @@ def getImageObjects(request,image_name):
         return one_record
     with open(one_record.image_object_path) as f_obj:
         data = json.load(f_obj)
+    logger.info('request the Image Object geojson for %s' % image_name)
     return JsonResponse(data)
