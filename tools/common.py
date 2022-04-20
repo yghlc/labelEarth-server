@@ -3,13 +3,22 @@ from imageObjects.models import Image
 from django.contrib.auth.models import User
 from imageObjects.models import UserInput
 
-def get_one_record(image_name):
+def get_one_record_image(image_name):
     # query = Image.objects.get(image_name=image_name)    # will raise DoesNotExist if not exist
     query = Image.objects.filter(image_name=image_name)  #
     if len(query) < 1:
-        return HttpResponse('%s not in the database' % image_name, status=404), False
+        return HttpResponse('%s not in the image database' % image_name, status=404), False
     elif len(query) > 1:
-        return HttpResponse('multiple %s in the database' % image_name, status=300), False
+        return HttpResponse('multiple %s in the image database' % image_name, status=300), False
+    else:
+        return query[0], True
+
+def get_one_record_user(user_name):
+    query = User.objects.filter(username=user_name)  #
+    if len(query) < 1:
+        return HttpResponse('%s not in the user database' % user_name, status=404), False
+    elif len(query) > 1:
+        return HttpResponse('multiple %s in the user database' % user_name, status=300), False
     else:
         return query[0], True
 

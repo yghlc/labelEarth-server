@@ -2,9 +2,18 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.http import FileResponse
+from django.http import HttpResponseRedirect
+
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+
+from imageObjects.forms import submitObjectForm
+# from .forms import imageObjectForm
 
 from imageObjects.models import Image
-from tools.common import get_one_record
+from imageObjects.models import UserInput
+from tools.common import get_one_record_image
+from tools.common import get_one_record_user
 from tools.common import get_available_image
 
 from datetime import datetime
@@ -32,7 +41,7 @@ def getItemOfImageObject_user(request,user_name):
     avail_image_name = get_available_image(user_name=user_name)
     if avail_image_name is not None:
         image_info['image_name'] = avail_image_name
-        one_record, b_success = get_one_record(avail_image_name)
+        one_record, b_success = get_one_record_image(avail_image_name)
         if b_success is False:
             return one_record
         image_info['image_center_lat'] = one_record.image_cen_lat
@@ -43,7 +52,7 @@ def getItemOfImageObject_user(request,user_name):
 
 def getImageFile(request,image_name):
     '''get the PNG file for an image '''
-    one_record, b_success = get_one_record(image_name)    #
+    one_record, b_success = get_one_record_image(image_name)    #
     if b_success is False:
         return one_record
     logger.info('request the image file for %s' % image_name)
@@ -51,7 +60,7 @@ def getImageFile(request,image_name):
 
 def getImageBound(request,image_name):
     '''get the image bounding box (geojson) for an image'''
-    one_record, b_success = get_one_record(image_name)    #
+    one_record, b_success = get_one_record_image(image_name)    #
     if b_success is False:
         return one_record
     with open(one_record.image_bound_path) as f_obj:
@@ -61,10 +70,51 @@ def getImageBound(request,image_name):
 
 def getImageObjects(request,image_name):
     '''get the objects on the image'''
-    one_record, b_success = get_one_record(image_name)    #
+    one_record, b_success = get_one_record_image(image_name)    #
     if b_success is False:
         return one_record
     with open(one_record.image_object_path) as f_obj:
         data = json.load(f_obj)
     logger.info('request the Image Object geojson for %s' % image_name)
     return JsonResponse(data)
+
+# csrf_exempt to remove the requiement of CSRF COOKIE
+@csrf_exempt
+def submitImageObjects(request,user_name):
+    '''submit object information for an image'''
+    # print('\n In submitImageObjects \n')
+    if request.method == 'POST':
+        # print('\n I just send a POST request \n')
+        # print('request.POST:',request.POST)
+        input_form = submitObjectForm(request.POST)
+        # print('input_form.is_valid()',input_form.is_valid())
+        if input_form.is_valid():
+            # print(input_form)     # it output a html string
+            image_name = input_form.cleaned_data['image_name']
+            # print('image_name after clean is:', image_name)
+            # save one record
+            user_rec, b_success = get_one_record_user(user_name)
+            if b_success is False:
+                return user_rec
+            image_rec, b_success = get_one_record_image(image_name)
+            if b_success is False:
+                return image_rec
+            # print("user_rec:",user_rec)
+            # print("image_rec:",image_rec)
+            user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
+                                      user_image_output='test.geojson',saving_time=datetime.now())
+            user_inpu_rec.save()
+            # updated one record for images
+            # img = Image(image_name=image_name, image_path=image_path, image_bound_path=image_bound_path,
+            #             image_object_path=image_object_path, concurrent_count=0, image_valid_times=0)
+            # img.save()
+
+            # get the next image for user to check
+            return HttpResponseRedirect('getitem')
+        else:
+            return HttpResponse('Thank you, I got a POST request, but is invalid')
+            # return HttpResponseRedirect(reverse('index'))
+    else:
+        pass
+
+    return HttpResponse('Hello, this is submitImageObjects. -Lingcao')
