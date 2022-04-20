@@ -107,9 +107,10 @@ def submitImageObjects(request,user_name):
                                       user_image_output='test.geojson',saving_time=datetime.now())
             user_inpu_rec.save()
             # updated one record for images
+            image_rec.image_valid_times += 1
             # img = Image(image_name=image_name, image_path=image_path, image_bound_path=image_bound_path,
             #             image_object_path=image_object_path, concurrent_count=0, image_valid_times=0)
-            # img.save()
+            image_rec.save()
 
             # get the next image for user to check
             return HttpResponseRedirect('getitem')
