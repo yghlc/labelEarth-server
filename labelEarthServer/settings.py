@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar'
+    'debug_toolbar',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'labelEarthServer.urls'
@@ -104,6 +106,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 INTERNAL_IPS = [
     "127.0.0.1",
+]
+
+# allow CORS ORIGIN
+CORS_ORIGIN_ALLOW_ALL  = False
+CORS_ORIGIN_WHITELIST  =  [
+    "https://yghlc.github.io",
+    "http://localhost:63343",
 ]
 
 # Internationalization
