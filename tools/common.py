@@ -3,6 +3,8 @@ from imageObjects.models import Image
 from django.contrib.auth.models import User
 from imageObjects.models import UserInput
 
+import imageObjects.views as  views
+
 def get_one_record_image(image_name):
     # query = Image.objects.get(image_name=image_name)    # will raise DoesNotExist if not exist
     query = Image.objects.filter(image_name=image_name)  #
@@ -31,7 +33,11 @@ def get_available_image(user_name=None):
         query = Image.objects.filter(image_valid_times__lte=max_valid_times).\
             filter(concurrent_count__lte=max_valid_times).order_by('image_name')  #
     else:
-        user_name_id = User.objects.get(username=user_name).id  # username is unqiue
+        if User.objects.filter(username=user_name).exists():
+            user_name_id = User.objects.get(username=user_name).id  # username is unqiue
+        else:
+            views.logger.error('User: %s does not exist'%user_name)
+            return None
         # print('\n user_name_id:',user_name_id)
         query_user = UserInput.objects.filter(user_name_id = user_name_id)
         # to make sure the user dont work on the same image
