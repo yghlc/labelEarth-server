@@ -35,9 +35,9 @@ def read_image_list():
     image_object_paths = []
     image_Bound = []
     for item in image_names:
-        image_paths.append(os.path.join(BASE_DIR,'data','images',item+'.png'))
-        image_object_paths.append(os.path.join(BASE_DIR,'data','objectPolygons',item+'.geojson'))
-        image_Bound.append(os.path.join(BASE_DIR,'data','imageBound',item+'.geojson'))
+        image_paths.append(os.path.join('data','images',item+'.png'))
+        image_object_paths.append(os.path.join('data','objectPolygons',item+'.geojson'))
+        image_Bound.append(os.path.join('data','imageBound',item+'.geojson'))
 
     return image_names,image_paths,image_Bound,image_object_paths
 
@@ -65,7 +65,7 @@ def main():
     cursor = conn.cursor()
 
     for image_name,image_path, image_bound, image_object_path in zip(image_names,image_paths,image_Bounds,image_object_paths):
-        center = get_centroid_imagebound_latlon(image_bound)
+        center = get_centroid_imagebound_latlon(os.path.join(BASE_DIR,image_bound))
         cen_lat, cen_lon = center.y, center.x
         insert_one_image_record(cursor, image_name, image_path, image_bound,image_object_path,cen_lat, cen_lon)
 

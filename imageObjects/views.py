@@ -23,6 +23,11 @@ import logging
 # for this one, __name__ is "imageObjects.views"  (set this logger in "setting")
 logger = logging.getLogger(__name__)
 
+import os
+from pathlib import Path
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # Create your views here.
 def index(request):
     return HttpResponse('Hello, please use additional terms to get or send data! -Lingcao')
@@ -58,14 +63,14 @@ def getImageFile(request,image_name):
     if b_success is False:
         return one_record
     logger.info('request the image file for %s' % image_name)
-    return FileResponse(open(one_record.image_path, 'rb'))
+    return FileResponse(open(os.path.join(BASE_DIR,one_record.image_path), 'rb'))
 
 def getImageBound(request,image_name):
     '''get the image bounding box (geojson) for an image'''
     one_record, b_success = get_one_record_image(image_name)    #
     if b_success is False:
         return one_record
-    with open(one_record.image_bound_path) as f_obj:
+    with open(os.path.join(BASE_DIR,one_record.image_bound_path)) as f_obj:
         data = json.load(f_obj)
     logger.info('request the Image Bound geojson for %s' % image_name)
     return JsonResponse(data)
@@ -75,7 +80,7 @@ def getImageObjects(request,image_name):
     one_record, b_success = get_one_record_image(image_name)    #
     if b_success is False:
         return one_record
-    with open(one_record.image_object_path) as f_obj:
+    with open(os.path.join(BASE_DIR,one_record.image_object_path)) as f_obj:
         data = json.load(f_obj)
     logger.info('request the Image Object geojson for %s' % image_name)
     return JsonResponse(data)
