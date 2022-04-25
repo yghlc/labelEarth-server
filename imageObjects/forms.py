@@ -19,4 +19,5 @@ from django import forms
 
 class submitObjectForm(forms.Form):
     image_name = forms.CharField(label='image_name', max_length=100)
-    # user_image_output = forms.FilePathField(None)
+    possibility = forms.CharField(label='possibility', max_length=100)
+    user_note = forms.CharField(label='user_note', max_length=4000)

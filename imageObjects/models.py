@@ -31,6 +31,8 @@ class UserInput(models.Model):
     # if a user input, then save to a file
     user_image_output = models.FilePathField(default=None)
     saving_time = models.DateTimeField(auto_now_add=True, blank=True)
+    possibility = models.CharField(max_length=20,default=None)
+    user_note = models.TextField(blank=True)
 
     def __str__(self):
         return str(self.user_name) + ' edit objects on ' + str(self.image_name)

@@ -98,6 +98,8 @@ def submitImageObjects(request,user_name):
         if input_form.is_valid():
             # print(input_form)     # it output a html string
             image_name = input_form.cleaned_data['image_name']
+            possibility = input_form.cleaned_data['possibility']
+            user_note = input_form.cleaned_data['user_note']
             # print('image_name after clean is:', image_name)
             # save one record
             user_rec, b_success = get_one_record_user(user_name)
@@ -109,7 +111,8 @@ def submitImageObjects(request,user_name):
             # print("user_rec:",user_rec)
             # print("image_rec:",image_rec)
             user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
-                                      user_image_output='test.geojson',saving_time=datetime.now())
+                                      user_image_output='test.geojson',saving_time=datetime.now(),
+                                      possibility=possibility,user_note=user_note)
             user_inpu_rec.save()
             # updated one record for images
             image_rec.image_valid_times += 1
