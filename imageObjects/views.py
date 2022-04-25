@@ -52,7 +52,9 @@ def getItemOfImageObject_user(request,user_name):
         image_info['image_center_lat'] = one_record.image_cen_lat
         image_info['image_center_lon'] = one_record.image_cen_lon
     else:
-        return HttpResponse('No available images for %s to work, Thank you!'%user_name)
+        image_info['image_name'] = 'NotAvailable'
+        image_info['image_center_lat'] = image_info['image_center_lon'] = 0
+        # return HttpResponse('No available images for %s to work, Thank you!'%user_name)
 
     logger.info('user: %s request an image'%str(user_name))
     return JsonResponse(image_info)
@@ -121,7 +123,8 @@ def submitImageObjects(request,user_name):
             image_rec.save()
 
             # get the next image for user to check
-            return HttpResponseRedirect('getitem')
+            return HttpResponseRedirect(reverse('index'))
+            # return HttpResponse('Thanks %s for the input of image: %s'%(user_name,image_name))
         else:
             return HttpResponse('Thank you, I got a POST request, but is invalid')
             # return HttpResponseRedirect(reverse('index'))
