@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-x-j32wbart2&i=6&d0wcg$93nvz+5s)t=mbb_kht61h9dx_!$g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.0.0.141']
 
 
 # Application definition
@@ -164,7 +164,7 @@ LOGGING = {
         'file':{
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR/'log_imageObjects.log',
+            'filename': '/tmp/log_imageObjects.log',
             'formatter': 'simple'
         }
     },
