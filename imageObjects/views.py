@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Create your views here.
 def index(request):
-    return HttpResponse('Hello, please use additional terms to get or send data! -Lingcao')
+    return HttpResponse('Hello, please use additional terms to get or send data!')
 
 def getItemOfImageObject(request):
     ''' get one available item: image, and return image_name '''
@@ -132,4 +132,4 @@ def submitImageObjects(request,user_name):
     else:
         pass
 
-    return HttpResponse('Hello, this is submitImageObjects. -Lingcao')
+    return HttpResponse('Hello, this is submitImageObjects.')
