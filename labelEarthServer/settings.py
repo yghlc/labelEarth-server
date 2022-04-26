@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,11 +28,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['10.0.0.141',
                  '127.0.0.1']
+MESSAGE_TAGS = {
+        messages.DEBUG: 'alert-secondary',
+        messages.INFO: 'alert-info',
+        messages.SUCCESS: 'alert-success',
+        messages.WARNING: 'alert-warning',
+        messages.ERROR: 'alert-danger',
+ }
 
+MAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'userManage.apps.UsermanageConfig',
     'imageObjects.apps.ImageobjectsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,7 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
-    'corsheaders'
+    'corsheaders',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
