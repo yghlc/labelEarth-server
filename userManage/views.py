@@ -89,6 +89,8 @@ def password_reset_request(request):
                     except BadHeaderError:
                         return HttpResponse('Invalid header found.')
                     return redirect ("/user/password_reset/done/")
+            else:
+                messages.error(request,'the input email does not exist!')
 
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="userManage/password/password_reset.html", context={"password_reset_form":password_reset_form})
