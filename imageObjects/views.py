@@ -97,6 +97,7 @@ def submitImageObjects(request,user_name):
         # print('request.POST:',request.POST)
         input_form = submitObjectForm(request.POST)
         # print('input_form.is_valid()',input_form.is_valid())
+        logger.info('% user_name submit a POST request'%user_name)
         if input_form.is_valid():
             # print(input_form)     # it output a html string
             image_name = input_form.cleaned_data['image_name']
