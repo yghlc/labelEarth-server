@@ -38,8 +38,8 @@ def login_request(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                messages.info(request, f"You are now logged in as {username}.")
+                # login(request, user)
+                # messages.info(request, f"You are now logged in as {username}.")
                 return redirect("/visual/index.html?username=%s"%username)
             else:
                 messages.error(request, "Invalid username or password.")
