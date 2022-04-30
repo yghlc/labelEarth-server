@@ -42,8 +42,8 @@ def getItemOfImageObject_user(request,user_name):
     image_info = {'image_name': None,
                   'image_center_lat': None,
                   'image_center_lon': None,
-                  'total_count':None,
-                  'user_contribute':None,
+                  'image_count':None,
+                  'contribution':None,
                   'total_user':None,
                   'user_rank':None}
 
@@ -64,8 +64,8 @@ def getItemOfImageObject_user(request,user_name):
     # get user contribution
     total_count, user_contribute, total_user, user_rank = calculate_user_contribution(user_name)
     if total_count is not None:
-        image_info['total_count'] = total_count
-        image_info['user_contribute'] = user_contribute
+        image_info['image_count'] = total_count
+        image_info['contribution'] = user_contribute
         image_info['total_user'] = total_user
         image_info['user_rank'] = user_rank
 
