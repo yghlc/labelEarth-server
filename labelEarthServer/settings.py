@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-x-j32wbart2&i=6&d0wcg$93nvz+5s)t=mbb_kht61h9dx_!$g
 DEBUG = True
 
 ALLOWED_HOSTS = ['10.0.0.141',
-                 '127.0.0.1']
+                 '127.0.0.1',
+                 '*']   # for all, during development.
 MESSAGE_TAGS = {
         messages.DEBUG: 'alert-secondary',
         messages.INFO: 'alert-info',
