@@ -3,11 +3,18 @@ from django.test import TestCase
 # run "python manage.py test imageObjects" for test
 
 from .views import getItemOfImageObject_user
+from tools.common import calculate_user_contribution
 
 # Create your tests here for the internal behavior of the code.
 class imageObjectsTests(TestCase):
     def test_helloworld(self):
         print('This is the test!')
+
+    def test_calculate_user_contribution(self):
+        user_name = 'huanglingcao'
+        # not working, has a problme to read database.
+        out = calculate_user_contribution(user_name)
+        print(out)
 
 # Creat tests for a view.
 from django.test.utils import teardown_test_environment, setup_test_environment

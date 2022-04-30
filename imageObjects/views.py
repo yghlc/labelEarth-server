@@ -15,6 +15,7 @@ from imageObjects.models import UserInput
 from tools.common import get_one_record_image
 from tools.common import get_one_record_user
 from tools.common import get_available_image
+from tools.common import calculate_user_contribution
 
 from datetime import datetime
 import json
@@ -40,7 +41,11 @@ def getItemOfImageObject_user(request,user_name):
     ''' get one available item: image, and return image_name '''
     image_info = {'image_name': None,
                   'image_center_lat': None,
-                  'image_center_lon': None}
+                  'image_center_lon': None,
+                  'total_count':None,
+                  'user_contribute':None,
+                  'total_user':None,
+                  'user_rank':None}
 
     # get the first available image_name (haven't been fully validated (<input's from the users))
     avail_image_name = get_available_image(user_name=user_name)
@@ -55,6 +60,14 @@ def getItemOfImageObject_user(request,user_name):
         image_info['image_name'] = 'NotAvailable'
         image_info['image_center_lat'] = image_info['image_center_lon'] = 0
         # return HttpResponse('No available images for %s to work, Thank you!'%user_name)
+
+    # get user contribution
+    total_count, user_contribute, total_user, user_rank = calculate_user_contribution(user_name)
+    if total_count is not None:
+        image_info['total_count'] = total_count
+        image_info['user_contribute'] = user_contribute
+        image_info['total_user'] = total_user
+        image_info['user_rank'] = user_rank
 
     logger.info('user: %s request an image'%str(user_name))
     return JsonResponse(image_info)
