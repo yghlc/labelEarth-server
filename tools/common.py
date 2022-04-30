@@ -30,8 +30,10 @@ def get_available_image(user_name=None):
 
     if user_name is None:
     # find images that image_valid_times < 3 and concurrent_count<3
-        query = Image.objects.filter(image_valid_times__lte=max_valid_times).\
-            filter(concurrent_count__lte=max_valid_times).order_by('image_name')  #
+    #     query = Image.objects.filter(image_valid_times__lte=max_valid_times).\
+    #         filter(concurrent_count__lte=max_valid_times).order_by('image_name')  #
+        views.logger.error('User is None')
+        return None
     else:
         if User.objects.filter(username=user_name).exists():
             user_name_id = User.objects.get(username=user_name).id  # username is unqiue
