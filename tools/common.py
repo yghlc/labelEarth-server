@@ -71,13 +71,15 @@ def calculate_user_contribution(user_name):
     total_count = Image.objects.count()     # total image count
     # output input from each user
     q_saved = UserInput.objects.exclude(possibility=None)
-    unique_user_ids = q_saved.values_list('user_name_id',flat=True)
+    unique_user_ids = list(q_saved.values_list('user_name_id',flat=True).distinct())
+    print('unique_user_ids:',unique_user_ids)
+    total_user = len(unique_user_ids)
     # total_save = q_saved.count()
     select_user_contri = q_saved.filter(user_name_id=user_name_id).count()
     if select_user_contri > 0:
         unique_user_ids.remove(user_name_id)
     else:
-        return total_count, select_user_contri, len(unique_user_ids), None
+        return total_count, select_user_contri, total_user, None
 
     other_contribute = {}
     other_contribute_list = []
@@ -87,13 +89,14 @@ def calculate_user_contribution(user_name):
         other_contribute_list.append(count)
     # get rank
     other_contribute_list = sorted(other_contribute_list,reverse=True) # from large to small
+    print(other_contribute_list)
     rank = 1
     for idx, num in enumerate(other_contribute_list):
-        if select_user_contri >= num:
+        if select_user_contri < num:
             rank = idx + 1
 
     # total image count,  user contribute count, total number of users with countribution,  rank.
-    return total_count, select_user_contri, len(unique_user_ids), rank
+    return total_count, select_user_contri, total_user, rank
 
 
 if __name__ == '__main__':
