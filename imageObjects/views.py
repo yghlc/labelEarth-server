@@ -16,6 +16,11 @@ from tools.common import get_one_record_image
 from tools.common import get_one_record_user
 from tools.common import get_available_image
 from tools.common import calculate_user_contribution
+from tools.common import update_concurrent_count
+
+
+max_valid_times = 3     # each image should only be valided less than 3 times.
+max_work_period_h = 12  # when a user get an image, it should be submit results in 12 hours
 
 from django.utils import timezone as datetime
 import json
@@ -67,6 +72,9 @@ def getItemOfImageObject_user(request,user_name):
         image_info['image_name'] = 'NotAvailable'
         image_info['image_center_lat'] = image_info['image_center_lon'] = 0
         # return HttpResponse('No available images for %s to work, Thank you!'%user_name)
+
+    # calculate the concurrent_count for each item (has been got, but not completed)
+    update_concurrent_count(max_valid_times=max_valid_times, max_period_h=max_work_period_h)
 
     # get user contribution
     total_count, user_contribute, total_user, user_rank = calculate_user_contribution(user_name)

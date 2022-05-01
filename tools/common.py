@@ -26,13 +26,7 @@ def get_one_record_user(user_name):
     else:
         return query[0], True
 
-def get_available_image(user_name=None):
-    # each image should only be valided less than 3 times.
-    max_valid_times = 3  # later use less than or equal
-
-    # calculate the concurrent_count for each item (has been got, but not completed)
-    update_concurrent_count(max_valid_times=max_valid_times)
-
+def get_available_image(user_name=None,max_valid_times = 3 ):
     if user_name is None:
     # find images that image_valid_times < 3 and concurrent_count<3
     #     query = Image.objects.filter(image_valid_times__lte=max_valid_times).\
