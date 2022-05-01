@@ -73,6 +73,11 @@ def update_concurrent_count(max_valid_times=3, max_period_h=12):
     old_time = datetime.now() - timedelta(hours = max_period_h)
     deleted, _rows_count = UserInput.objects.filter(possibility=None).filter(init_time__lt = old_time).delete()
     print('deleted, _rows_count:',deleted, _rows_count)
+    if deleted > 0:
+        # set to 0 (in case it removes all), the next code will update the correct concurrent_count
+        row_count = Image.objects.filter(image_valid_times__lt=max_valid_times). \
+            filter(concurrent_count__gt=0).update(concurrent_count=0)  # set as 0
+        print('After deleting records, Set concurrent_count of %d records to 0' % row_count)
 
     # calculate the concurrent_count again
     input_qs = UserInput.objects.filter(possibility=None)
