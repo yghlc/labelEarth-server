@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from imageObjects.models import Image
 from django.contrib.auth.models import User
 from imageObjects.models import UserInput
+from django.utils import timezone as datetime
+from datetime import timedelta
 
 import imageObjects.views as  views
 
@@ -26,7 +28,10 @@ def get_one_record_user(user_name):
 
 def get_available_image(user_name=None):
     # each image should only be valided less than 3 times.
-    max_valid_times = 2  # later use less than or equal.
+    max_valid_times = 3  # later use less than or equal
+
+    # calculate the concurrent_count for each item (has been got, but not completed)
+    update_concurrent_count(max_valid_times=max_valid_times)
 
     if user_name is None:
     # find images that image_valid_times < 3 and concurrent_count<3
@@ -45,18 +50,38 @@ def get_available_image(user_name=None):
         # to make sure the user dont work on the same image
         checked_image_ids = [item.image_name_id for item in query_user]
         # print('\n checked_image_ids \n',checked_image_ids)
-        query = Image.objects.filter(image_valid_times__lte=max_valid_times). \
-            filter(concurrent_count__lte=max_valid_times).\
+        query = Image.objects.filter(image_valid_times__lt=max_valid_times). \
+            filter(concurrent_count__lt=max_valid_times).\
             exclude(id__in=checked_image_ids).order_by('image_name')  # id__not_in not works, use exclude
 
     # for record in query:
     #     print(record.image_name, record.concurrent_count,record.image_valid_times)
     # remove records that image_valid_times + concurrent_count > 3
-    sel_query = [ item for item in query if item.image_valid_times + item.concurrent_count <= max_valid_times ]
+    sel_query = [ item for item in query if item.image_valid_times + item.concurrent_count < max_valid_times ]
     if len(sel_query) < 1:
         return None
 
     return sel_query[0].image_name
+
+def update_concurrent_count(max_valid_times=3, max_period_h=12):
+    # set the concurrent count for image has been completed as 0
+    row_count = Image.objects.filter(image_valid_times__gte=max_valid_times).\
+                            filter(concurrent_count__gt=0).update(concurrent_count=0)  # set as 0
+    print('Set concurrent_count of %d records to 0' % row_count)
+
+    # remove incomplete records older than max_period_h hours
+    old_time = datetime.now() - timedelta(hours = max_period_h)
+    deleted, _rows_count = UserInput.objects.filter(possibility=None).filter(init_time__lt = old_time).delete()
+    print('deleted, _rows_count:',deleted, _rows_count)
+
+    # calculate the concurrent_count again
+    input_qs = UserInput.objects.filter(possibility=None)
+    if len(input_qs) > 0:
+        image_ids = list(input_qs.values_list('image_name_id',flat=True)) # .distinct()
+        for id in set(image_ids):
+            qs = Image.objects.get(id=id)
+            qs.concurrent_count = image_ids.count(id)
+            qs.save()
 
 
 def calculate_user_contribution(user_name):
@@ -72,7 +97,7 @@ def calculate_user_contribution(user_name):
     # output input from each user
     q_saved = UserInput.objects.exclude(possibility=None)
     unique_user_ids = list(q_saved.values_list('user_name_id',flat=True).distinct())
-    print('unique_user_ids:',unique_user_ids)
+    # print('unique_user_ids:',unique_user_ids)
     total_user = len(unique_user_ids)
     # total_save = q_saved.count()
     select_user_contri = q_saved.filter(user_name_id=user_name_id).count()
@@ -89,13 +114,13 @@ def calculate_user_contribution(user_name):
         other_contribute_list.append(count)
     # get rank
     other_contribute_list = sorted(other_contribute_list,reverse=True) # from large to small
-    print(other_contribute_list)
+    # print(other_contribute_list)
     rank = 1
     for idx, num in enumerate(other_contribute_list):
         if select_user_contri < num:
             rank = idx + 1
 
-    # total image count,  user contribute count, total number of users with countribution,  rank.
+    # total image count,  user contribute count, total number of users with contribution,  rank.
     return total_count, select_user_contri, total_user, rank
 
 

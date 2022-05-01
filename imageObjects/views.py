@@ -17,7 +17,7 @@ from tools.common import get_one_record_user
 from tools.common import get_available_image
 from tools.common import calculate_user_contribution
 
-from datetime import datetime
+from django.utils import timezone as datetime
 import json
 
 import logging
@@ -56,6 +56,13 @@ def getItemOfImageObject_user(request,user_name):
             return one_record
         image_info['image_center_lat'] = one_record.image_cen_lat
         image_info['image_center_lon'] = one_record.image_cen_lon
+
+        # create a record in UserInput(possibility=None), user and image has been checked in get_available_image
+        user_rec, b_success = get_one_record_user(user_name)
+        image_rec, b_success = get_one_record_image(avail_image_name)
+        user_inpu_rec = UserInput(user_name=user_rec, image_name=image_rec,
+                                  init_time=datetime.now(),possibility=None)
+        user_inpu_rec.save()
     else:
         image_info['image_name'] = 'NotAvailable'
         image_info['image_center_lat'] = image_info['image_center_lon'] = 0
@@ -126,8 +133,15 @@ def submitImageObjects(request,user_name):
                 return image_rec
             # print("user_rec:",user_rec)
             # print("image_rec:",image_rec)
-            user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
-                                      user_image_output='test.geojson',saving_time=datetime.now(),
+            if UserInput.objects.filter(user_name_id=user_rec.id, image_name_id=image_rec.id).exists():
+                user_inpu_rec = UserInput.objects.get(user_name_id=user_rec.id, image_name_id=image_rec.id)
+                user_inpu_rec.save_time = datetime.now()
+                user_inpu_rec.user_image_output = 'test.geojson'
+                user_inpu_rec.possibility = possibility
+                user_inpu_rec.user_note = user_note
+            else:
+                user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
+                                      user_image_output='test.geojson',save_time=datetime.now(),
                                       possibility=possibility,user_note=user_note)
             user_inpu_rec.save()
             # updated one record for images

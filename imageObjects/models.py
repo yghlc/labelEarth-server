@@ -29,10 +29,11 @@ class UserInput(models.Model):
     user_name = models.ForeignKey(User,on_delete=models.CASCADE)
     image_name = models.ForeignKey(Image,on_delete=models.CASCADE)
     # if a user input, then save to a file
-    user_image_output = models.FilePathField(default=None)
-    saving_time = models.DateTimeField(auto_now_add=True, blank=True)
-    possibility = models.CharField(max_length=20,default=None)
-    user_note = models.TextField(blank=True)
+    user_image_output = models.FilePathField(default=None,null=True)
+    init_time = models.DateTimeField(default=None, blank=True)     # the time user request a image
+    save_time = models.DateTimeField(default=None, blank=True,null=True)     # the time user save results
+    possibility = models.CharField(max_length=20,default=None,null=True)
+    user_note = models.TextField(blank=True,null=True)
 
     def __str__(self):
         return str(self.user_name) + ' edit objects on ' + str(self.image_name)
