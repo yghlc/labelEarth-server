@@ -154,6 +154,7 @@ def submitImageObjects(request,user_name):
             user_inpu_rec.save()
             # updated one record for images
             image_rec.image_valid_times += 1
+            image_rec.concurrent_count -= 1
             # img = Image(image_name=image_name, image_path=image_path, image_bound_path=image_bound_path,
             #             image_object_path=image_object_path, concurrent_count=0, image_valid_times=0)
             image_rec.save()
