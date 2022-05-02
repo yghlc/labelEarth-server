@@ -71,7 +71,7 @@ def remove_invalid_userinput(max_period_h=12):
         image_rec.concurrent_count -= 1
         image_rec.save()
 
-    print('Deleted %d invalid userInput records' % len(invalid_qs))
+        views.logger.info('Deleted %d invalid userInput records' % len(invalid_qs))
 
 def update_concurrent_count(max_valid_times=3, max_period_h=12):
     # # set the concurrent count for image has been completed as 0
