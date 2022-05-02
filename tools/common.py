@@ -57,21 +57,27 @@ def get_available_image(user_name=None,max_valid_times = 3 ):
 
     return sel_query[0].image_name
 
-def update_concurrent_count(max_valid_times=3, max_period_h=12):
-    # set the concurrent count for image has been completed as 0
-    row_count = Image.objects.filter(image_valid_times__gte=max_valid_times).\
-                            filter(concurrent_count__gt=0).update(concurrent_count=0)  # set as 0
-    print('Set concurrent_count of %d records to 0' % row_count)
-
+def remove_invalid_userinput(max_period_h=12):
     # remove incomplete records older than max_period_h hours
     old_time = datetime.now() - timedelta(hours = max_period_h)
-    deleted, _rows_count = UserInput.objects.filter(possibility=None).filter(init_time__lt = old_time).delete()
-    print('deleted, _rows_count:',deleted, _rows_count)
-    if deleted > 0:
-        # set to 0 (in case it removes all), the next code will update the correct concurrent_count
-        row_count = Image.objects.filter(image_valid_times__lt=max_valid_times). \
-            filter(concurrent_count__gt=0).update(concurrent_count=0)  # set as 0
-        print('After deleting records, Set concurrent_count of %d records to 0' % row_count)
+    # deleted, _rows_count = UserInput.objects.filter(possibility=None).filter(init_time__lt = old_time).delete()
+    # print('deleted, _rows_count:', deleted, _rows_count)
+    invalid_qs = UserInput.objects.filter(possibility=None).filter(init_time__lt = old_time)
+
+    for qs in invalid_qs:
+        user_input_rec = UserInput.objects.get(id=qs.id)
+        image_rec = Image.objects.get(id=user_input_rec.image_name_id)
+        user_input_rec.delete()
+        image_rec.concurrent_count -= 1
+        image_rec.save()
+
+    print('Deleted %d invalid userInput records' % len(invalid_qs))
+
+def update_concurrent_count(max_valid_times=3, max_period_h=12):
+    # # set the concurrent count for image has been completed as 0
+    # row_count = Image.objects.filter(image_valid_times__gte=max_valid_times).\
+    #                         filter(concurrent_count__gt=0).update(concurrent_count=0)  # set as 0
+    # print('Set concurrent_count of %d records to 0' % row_count)
 
     # calculate the concurrent_count again
     input_qs = UserInput.objects.filter(possibility=None)

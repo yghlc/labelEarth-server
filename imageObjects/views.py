@@ -17,6 +17,7 @@ from tools.common import get_one_record_user
 from tools.common import get_available_image
 from tools.common import calculate_user_contribution
 from tools.common import update_concurrent_count
+from tools.common import remove_invalid_userinput
 
 
 max_valid_times = 3     # each image should only be valided less than 3 times.
@@ -52,8 +53,9 @@ def getItemOfImageObject_user(request,user_name):
                   'total_user':None,
                   'user_rank':None}
 
+    remove_invalid_userinput(max_period_h=max_work_period_h)
     # get the first available image_name (haven't been fully validated (<input's from the users))
-    avail_image_name = get_available_image(user_name=user_name)
+    avail_image_name = get_available_image(user_name=user_name,max_valid_times=max_valid_times)
     if avail_image_name is not None:
         image_info['image_name'] = avail_image_name
         one_record, b_success = get_one_record_image(avail_image_name)
