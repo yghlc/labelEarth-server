@@ -37,7 +37,7 @@ def read_image_list():
     for item in image_names:
         image_paths.append(os.path.join('data','images',item+'.png'))
         image_object_paths.append(os.path.join('data','objectPolygons',item+'.geojson'))
-        image_Bound.append(os.path.join('data','imageBound',item+'.geojson'))
+        image_Bound.append(os.path.join('data','imageBound',item+'_bound.geojson'))
 
     return image_names,image_paths,image_Bound,image_object_paths
 
