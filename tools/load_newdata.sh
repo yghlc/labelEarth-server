@@ -12,7 +12,8 @@ if [ ! -f imageObjects.json ]; then
 fi
 
 # clear record in tables: image and userinput
-python manage.py migrate imageObjects zero  # some problems here
-
+python manage.py migrate imageObjects zero    # remove the table
+python manage.py migrate imageObjects         # create a empty table
 
 # insert images in "data" to the image table
+python ./tools/add_image_to_database.py
