@@ -2,8 +2,9 @@
 *.pyc
 .idea
 
-db.sqlite3
+*.sqlite3
 
 data
+data-2examples
 
 *.json
