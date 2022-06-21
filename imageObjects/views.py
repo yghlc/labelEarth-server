@@ -18,6 +18,7 @@ from tools.common import get_available_image
 from tools.common import calculate_user_contribution
 from tools.common import update_concurrent_count
 from tools.common import remove_invalid_userinput
+from tools.common import get_previous_item
 
 
 max_valid_times = 3     # each image should only be valided less than 3 times.
@@ -88,6 +89,47 @@ def getItemOfImageObject_user(request,user_name):
 
     logger.info('user: %s request an image'%str(user_name))
     return JsonResponse(image_info)
+
+def getPreviousImageObject_user(request,user_name,image_name):
+    ''' get previous image that a user submitted,  and return image_name '''
+    image_info = {'image_name': None,
+                  'image_center_lat': None,
+                  'image_center_lon': None,
+                  'possibility':None,
+                  'user_note':None,
+                  'image_count': None,
+                  'contribution': None,
+                  'total_user': None,
+                  'user_rank': None}
+
+    pre_image_name, possibility,user_note = get_previous_item(user_name,image_name)
+    print(pre_image_name, possibility,user_note)
+    if pre_image_name is not None:
+        image_info['image_name'] = pre_image_name
+        one_record, b_success = get_one_record_image(pre_image_name)
+        if b_success is False:
+            return one_record
+        image_info['image_center_lat'] = one_record.image_cen_lat
+        image_info['image_center_lon'] = one_record.image_cen_lon
+        if possibility is not None:
+            image_info['possibility'] = possibility
+        if user_note is not None:
+            image_info['user_note'] = user_note
+    else:
+        image_info['image_name'] = 'NotAvailable'
+        image_info['image_center_lat'] = image_info['image_center_lon'] = 0
+
+    # get user contribution
+    total_count, user_contribute, total_user, user_rank = calculate_user_contribution(user_name)
+    if total_count is not None:
+        image_info['image_count'] = total_count
+        image_info['contribution'] = user_contribute
+        image_info['total_user'] = total_user
+        image_info['user_rank'] = user_rank
+
+    logger.info('user: %s got an image that has been checked previously' % str(user_name))
+    return JsonResponse(image_info)
+
 
 def getImageFile(request,image_name):
     '''get the PNG file for an image '''

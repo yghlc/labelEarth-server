@@ -26,6 +26,25 @@ def get_one_record_user(user_name):
     else:
         return query[0], True
 
+def get_user_id(user_name):
+    if User.objects.filter(username=user_name).exists():
+        user_name_id = User.objects.get(username=user_name).id  # username is unqiue
+        return user_name_id
+    else:
+        views.logger.error('User: %s does not exist' % user_name)
+        return None
+
+def get_image_id(image_name):
+    query = Image.objects.filter(image_name=image_name)
+    if len(query)==1:
+        return query[0].id
+    elif len(query) < 1:
+        views.logger.error('Image: %s does not exist' % image_name)
+        return None
+    else:
+        views.logger.error('%d Image have the same name' % len(query))
+        return None
+
 def get_available_image(user_name=None,max_valid_times = 3 ):
     if user_name is None:
     # find images that image_valid_times < 3 and concurrent_count<3
@@ -34,10 +53,8 @@ def get_available_image(user_name=None,max_valid_times = 3 ):
         views.logger.error('User is None')
         return None
     else:
-        if User.objects.filter(username=user_name).exists():
-            user_name_id = User.objects.get(username=user_name).id  # username is unqiue
-        else:
-            views.logger.error('User: %s does not exist'%user_name)
+        user_name_id = get_user_id(user_name)
+        if user_name_id is None:
             return None
         # print('\n user_name_id:',user_name_id)
         query_user = UserInput.objects.filter(user_name_id = user_name_id)
@@ -56,6 +73,33 @@ def get_available_image(user_name=None,max_valid_times = 3 ):
         return None
 
     return sel_query[0].image_name
+
+def get_previous_item(user_name,current_image):
+    # get previous image that a user submitted, user_name is required
+    user_name_id = get_user_id(user_name)
+    if user_name_id is None:
+        return None
+    current_image_id = get_image_id(current_image)
+    if current_image_id is None:
+        return None
+
+    # all input from the user
+    query_user = UserInput.objects.filter(user_name_id=user_name_id)
+    if len(query_user) < 1:
+        return None
+
+    # to make sure the user dont work on the same image
+    checked_image_ids = [item.image_name_id for item in query_user]
+    checked_image_ids = sorted(checked_image_ids)
+    current_idx = checked_image_ids.index(current_image_id)
+    if current_idx == 0:
+        # previous_image_id = checked_image_ids[0]
+        return None  # current one is the first one
+    else:
+        previous_image_id = checked_image_ids[current_idx-1]
+        rec_img = Image.objects.filter(id=previous_image_id)[0]
+        rec_input = UserInput.objects.filter(image_name_id=previous_image_id)[0]
+        return rec_img.image_name, rec_input.possibility, rec_input.user_note
 
 def remove_invalid_userinput(max_period_h=12):
     # remove incomplete records older than max_period_h hours
