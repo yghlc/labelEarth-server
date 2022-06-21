@@ -165,7 +165,7 @@ def submitImageObjects(request,user_name):
             return HttpResponseRedirect(reverse('index'))
             # return HttpResponse('Thanks %s for the input of image: %s'%(user_name,image_name))
         else:
-            return HttpResponse('Thank you, I got a POST request, but is invalid')
+            return HttpResponse('Thank you, I got a POST request, but it is invalid')
             # return HttpResponseRedirect(reverse('index'))
     else:
         pass
