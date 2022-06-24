@@ -26,6 +26,22 @@ def get_one_record_user(user_name):
     else:
         return query[0], True
 
+def get_one_record_userInput(user_name,image_name):
+    user_name_id = get_user_id(user_name)
+    if user_name_id is None:
+        return HttpResponse('%s not in the user database' % user_name, status=404), False
+    image_id = get_image_id(image_name)
+    if image_id is None:
+        return HttpResponse('%s not in the image database' % image_name, status=404), False
+
+    query = UserInput.objects.filter(user_name_id=user_name_id, image_name_id=image_id)
+    if len(query) < 1:
+        return HttpResponse('%s input on image: %s is not in the userinput database' % (user_name,image_name), status=404), False
+    elif len(query) > 1:
+        return HttpResponse('multiple userInput: %s-%s in the userinput database' % (user_name,image_name), status=300), False
+    else:
+        return query[0], True
+
 def get_user_id(user_name):
     if User.objects.filter(username=user_name).exists():
         user_name_id = User.objects.get(username=user_name).id  # username is unqiue
@@ -99,7 +115,7 @@ def get_previous_item(user_name,current_image):
         previous_image_id = checked_image_ids[current_idx-1]
         rec_img = Image.objects.filter(id=previous_image_id)[0]
         rec_input = UserInput.objects.filter(image_name_id=previous_image_id)[0]
-        return rec_img.image_name, rec_input.possibility, rec_input.user_note
+        return rec_img.image_name, rec_input.possibility, rec_input.user_note, rec_input.user_image_output
 
 def remove_invalid_userinput(max_period_h=12):
     # remove incomplete records older than max_period_h hours

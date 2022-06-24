@@ -14,6 +14,7 @@ from imageObjects.models import Image
 from imageObjects.models import UserInput
 from tools.common import get_one_record_image
 from tools.common import get_one_record_user
+from tools.common import get_one_record_userInput
 from tools.common import get_available_image
 from tools.common import calculate_user_contribution
 from tools.common import update_concurrent_count
@@ -97,12 +98,13 @@ def getPreviousImageObject_user(request,user_name,image_name):
                   'image_center_lon': None,
                   'possibility':None,
                   'user_note':None,
+                  'edit_polygons':None,
                   'image_count': None,
                   'contribution': None,
                   'total_user': None,
                   'user_rank': None}
 
-    pre_image_name, possibility,user_note = get_previous_item(user_name,image_name)
+    pre_image_name, possibility,user_note, edit_polygons = get_previous_item(user_name,image_name)
     print(pre_image_name, possibility,user_note)
     if pre_image_name is not None:
         image_info['image_name'] = pre_image_name
@@ -115,6 +117,8 @@ def getPreviousImageObject_user(request,user_name,image_name):
             image_info['possibility'] = possibility
         if user_note is not None:
             image_info['user_note'] = user_note
+        if edit_polygons is not None or edit_polygons != 'test.geojson':
+            image_info['edit_polygons'] = edit_polygons
     else:
         image_info['image_name'] = 'NotAvailable'
         image_info['image_center_lat'] = image_info['image_center_lon'] = 0
@@ -213,3 +217,35 @@ def submitImageObjects(request,user_name):
         pass
 
     return HttpResponse('Hello, this is submitImageObjects.')
+
+@csrf_exempt
+def savePolygons(request,user_name,image_name):
+    '''save polygons user add or edit for an image to server'''
+    print('\n In savePolygons \n')
+    if request.method == 'POST':
+        # print(request.body)
+        try:
+            data = json.loads(request.body) # request.body is a string
+        except Exception as e:
+            logger.error('%s json.loads: %s'%(user_name,e))
+            return HttpResponse('json.loads: error: %s'%e)
+
+        # print('data:',data)
+        logger.info('%s submit a POST request to save polygons' % user_name)
+        # save to database
+        rel_path = os.path.join('data','objectPolygons','%s_by_%s.geojson'%(image_name,user_name))
+        save_file_path = os.path.join(BASE_DIR,rel_path)
+        # replace the old file if it exists
+        with open(save_file_path,'w') as f_obj:
+            json.dump(data,f_obj)
+
+        # save the file name to database
+        user_input_rec, b_success = get_one_record_userInput(user_name,image_name)
+        if b_success is False:
+            return user_input_rec
+        user_input_rec.user_image_output = rel_path
+        user_input_rec.save()
+
+        return HttpResponse('Saving polygons OK!')
+    else:
+        return HttpResponse('This is savePolygons.')

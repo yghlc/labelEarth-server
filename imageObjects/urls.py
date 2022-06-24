@@ -14,5 +14,6 @@ urlpatterns = [
     path('<str:image_name>/imagebound',views.getImageBound, name='getImageBound'),
     path('<str:image_name>/imageobject',views.getImageObjects, name='getImageObjects'),
     # user submit a result, post request
-    path('<str:user_name>/submitImageObjects',views.submitImageObjects, name='submitImageObjects')
+    path('<str:user_name>/submitImageObjects',views.submitImageObjects, name='submitImageObjects'),
+    path('<str:user_name>/savePolygons/<str:image_name>',views.savePolygons, name='savePolygons')
 ]
