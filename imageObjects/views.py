@@ -218,8 +218,8 @@ def submitImageObjects(request,user_name):
             image_rec.save()
 
             # get the next image for user to check
-            return HttpResponseRedirect(reverse('index'))
-            # return HttpResponse('Thanks %s for the input of image: %s'%(user_name,image_name))
+            # return HttpResponseRedirect(reverse('index'))
+            return HttpResponse('save the input from %s for image: %s successfully'%(user_name,image_name))
         else:
             return HttpResponse('Thank you, I got a POST request, but it is invalid')
             # return HttpResponseRedirect(reverse('index'))
