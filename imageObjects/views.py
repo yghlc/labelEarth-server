@@ -163,6 +163,16 @@ def getImageObjects(request,image_name):
     logger.info('request the Image Object geojson for %s' % image_name)
     return JsonResponse(data)
 
+def getEditedObjects(request,user_name,image_name):
+    '''get the polygons edited or added by a user for the image'''
+    user_input_rec, b_success = get_one_record_userInput(user_name, image_name)
+    if b_success is False:
+        return user_input_rec
+    with open(os.path.join(BASE_DIR,user_input_rec.user_image_output)) as f_obj:
+        data = json.load(f_obj)
+    logger.info('request the user:%s added or edited polygons for %s' % (user_name,image_name))
+    return JsonResponse(data)
+
 # csrf_exempt to remove the requiement of CSRF COOKIE
 @csrf_exempt
 def submitImageObjects(request,user_name):
@@ -221,7 +231,7 @@ def submitImageObjects(request,user_name):
 @csrf_exempt
 def savePolygons(request,user_name,image_name):
     '''save polygons user add or edit for an image to server'''
-    print('\n In savePolygons \n')
+    # print('\n In savePolygons \n')
     if request.method == 'POST':
         # print(request.body)
         try:
