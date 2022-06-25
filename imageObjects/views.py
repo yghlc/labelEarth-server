@@ -117,7 +117,7 @@ def getPreviousImageObject_user(request,user_name,image_name):
             image_info['possibility'] = possibility
         if user_note is not None:
             image_info['user_note'] = user_note
-        if edit_polygons is not None or edit_polygons != 'test.geojson':
+        if edit_polygons is not None and edit_polygons != 'test.geojson':
             image_info['edit_polygons'] = edit_polygons
     else:
         image_info['image_name'] = 'NotAvailable'
@@ -202,7 +202,7 @@ def submitImageObjects(request,user_name):
             if UserInput.objects.filter(user_name_id=user_rec.id, image_name_id=image_rec.id).exists():
                 user_inpu_rec = UserInput.objects.get(user_name_id=user_rec.id, image_name_id=image_rec.id)
                 user_inpu_rec.save_time = datetime.now()
-                user_inpu_rec.user_image_output = 'test.geojson'
+                # user_inpu_rec.user_image_output = 'test.geojson'
                 user_inpu_rec.possibility = possibility
                 user_inpu_rec.user_note = user_note
             else:
