@@ -168,7 +168,11 @@ def getEditedObjects(request,user_name,image_name):
     user_input_rec, b_success = get_one_record_userInput(user_name, image_name)
     if b_success is False:
         return user_input_rec
-    with open(os.path.join(BASE_DIR,user_input_rec.user_image_output)) as f_obj:
+    geojson = os.path.join(BASE_DIR,user_input_rec.user_image_output)
+    if os.path.exists(geojson) is False:
+        return HttpResponse('error: %s does not exsit'%geojson)
+
+    with open(geojson) as f_obj:
         data = json.load(f_obj)
     logger.info('request the user:%s added or edited polygons for %s' % (user_name,image_name))
     return JsonResponse(data)
