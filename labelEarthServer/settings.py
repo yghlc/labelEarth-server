@@ -98,6 +98,7 @@ WSGI_APPLICATION = 'labelEarthServer.wsgi.application'
 #     }
 # }
 
+database_engine = parameters.get_string_parameters('setting.ini','database_engine')
 database_name = parameters.get_string_parameters('setting.ini','database_name')
 database_user = parameters.get_string_parameters('setting.ini','database_user')
 database_password = parameters.get_string_parameters('setting.ini','database_password')
@@ -106,7 +107,7 @@ database_port = parameters.get_string_parameters('setting.ini','database_port')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': database_engine,
         'NAME': database_name,
         'USER': database_user,
         'PASSWORD': database_password,
