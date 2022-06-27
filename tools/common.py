@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from imageObjects.models import UserInput
 from django.utils import timezone as datetime
 from datetime import timedelta
+from django.db import transaction
 
 import imageObjects.views as  views
 
@@ -26,7 +27,7 @@ def get_one_record_user(user_name):
     else:
         return query[0], True
 
-def get_one_record_userInput(user_name,image_name):
+def get_one_record_userInput(user_name,image_name,b_update=False):
     user_name_id = get_user_id(user_name)
     if user_name_id is None:
         return HttpResponse('%s not in the user database' % user_name, status=404), False
@@ -34,7 +35,10 @@ def get_one_record_userInput(user_name,image_name):
     if image_id is None:
         return HttpResponse('%s not in the image database' % image_name, status=404), False
 
-    query = UserInput.objects.filter(user_name_id=user_name_id, image_name_id=image_id)
+    if b_update:
+        query = UserInput.objects.select_for_update().filter(user_name_id=user_name_id, image_name_id=image_id)
+    else:
+        query = UserInput.objects.filter(user_name_id=user_name_id, image_name_id=image_id)
     if len(query) < 1:
         return HttpResponse('%s input on image: %s is not in the userinput database' % (user_name,image_name), status=404), False
     elif len(query) > 1:
@@ -126,10 +130,11 @@ def remove_invalid_userinput(max_period_h=12):
 
     for qs in invalid_qs:
         user_input_rec = UserInput.objects.get(id=qs.id)
-        image_rec = Image.objects.get(id=user_input_rec.image_name_id)
         user_input_rec.delete()
-        image_rec.concurrent_count -= 1
-        image_rec.save()
+        with transaction.atomic():
+            image_rec = Image.objects.select_for_update().get(id=user_input_rec.image_name_id)
+            image_rec.concurrent_count = max(image_rec.concurrent_count - 1, 0)
+            image_rec.save()
     if len(invalid_qs) > 0:
         views.logger.info('Deleted %d invalid userInput records' % len(invalid_qs))
 
@@ -144,9 +149,10 @@ def update_concurrent_count(max_valid_times=3, max_period_h=12):
     if len(input_qs) > 0:
         image_ids = list(input_qs.values_list('image_name_id',flat=True)) # .distinct()
         for id in set(image_ids):
-            qs = Image.objects.get(id=id)
-            qs.concurrent_count = image_ids.count(id)
-            qs.save()
+            with transaction.atomic():
+                qs = Image.objects.select_for_update().get(id=id)
+                qs.concurrent_count = image_ids.count(id)
+                qs.save()
 
 
 def calculate_user_contribution(user_name):

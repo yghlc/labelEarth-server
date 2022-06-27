@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from django.db import transaction
 
 from imageObjects.forms import submitObjectForm
 # from .forms import imageObjectForm
@@ -204,22 +205,24 @@ def submitImageObjects(request,user_name):
             # print("user_rec:",user_rec)
             # print("image_rec:",image_rec)
             if UserInput.objects.filter(user_name_id=user_rec.id, image_name_id=image_rec.id).exists():
-                user_inpu_rec = UserInput.objects.get(user_name_id=user_rec.id, image_name_id=image_rec.id)
-                user_inpu_rec.save_time = datetime.now()
-                # user_inpu_rec.user_image_output = 'test.geojson'
-                user_inpu_rec.possibility = possibility
-                user_inpu_rec.user_note = user_note
+                with transaction.atomic():
+                    user_inpu_rec = UserInput.objects.select_for_update().get(user_name_id=user_rec.id, image_name_id=image_rec.id)
+                    user_inpu_rec.save_time = datetime.now()
+                    # user_inpu_rec.user_image_output = 'test.geojson'
+                    user_inpu_rec.possibility = possibility
+                    user_inpu_rec.user_note = user_note
+                    user_inpu_rec.save()
             else:
                 user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
                                       user_image_output='test.geojson',save_time=datetime.now(),
                                       possibility=possibility,user_note=user_note)
-            user_inpu_rec.save()
+                user_inpu_rec.save()
             # updated one record for images
-            image_rec.image_valid_times += 1
-            image_rec.concurrent_count -= 1
-            # img = Image(image_name=image_name, image_path=image_path, image_bound_path=image_bound_path,
-            #             image_object_path=image_object_path, concurrent_count=0, image_valid_times=0)
-            image_rec.save()
+            with transaction.atomic():
+                image_rec_update = Image.objects.select_for_update().get(image_name=image_name)
+                image_rec_update.image_valid_times += 1
+                image_rec_update.concurrent_count = max(image_rec_update.concurrent_count-1,0)
+                image_rec_update.save()
 
             # get the next image for user to check
             # return HttpResponseRedirect(reverse('index'))
@@ -254,11 +257,12 @@ def savePolygons(request,user_name,image_name):
             json.dump(data,f_obj)
 
         # save the file name to database
-        user_input_rec, b_success = get_one_record_userInput(user_name,image_name)
-        if b_success is False:
-            return user_input_rec
-        user_input_rec.user_image_output = rel_path
-        user_input_rec.save()
+        with transaction.atomic():
+            user_input_rec, b_success = get_one_record_userInput(user_name,image_name,b_update=True)
+            if b_success is False:
+                return user_input_rec
+            user_input_rec.user_image_output = rel_path
+            user_input_rec.save()
 
         return HttpResponse('Saving polygons OK!')
     else:
