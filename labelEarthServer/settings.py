@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os.path
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -98,12 +98,13 @@ WSGI_APPLICATION = 'labelEarthServer.wsgi.application'
 #     }
 # }
 
-database_engine = parameters.get_string_parameters('setting.ini','database_engine')
-database_name = parameters.get_string_parameters('setting.ini','database_name')
-database_user = parameters.get_string_parameters('setting.ini','database_user')
-database_password = parameters.get_string_parameters('setting.ini','database_password')
-database_host = parameters.get_string_parameters('setting.ini','database_host')
-database_port = parameters.get_string_parameters('setting.ini','database_port')
+setting_file = os.path.join(BASE_DIR,'setting.ini')
+database_engine = parameters.get_string_parameters(setting_file,'database_engine')
+database_name = parameters.get_string_parameters(setting_file,'database_name')
+database_user = parameters.get_string_parameters(setting_file,'database_user')
+database_password = parameters.get_string_parameters(setting_file,'database_password')
+database_host = parameters.get_string_parameters(setting_file,'database_host')
+database_port = parameters.get_string_parameters(setting_file,'database_port')
 
 DATABASES = {
     'default': {
