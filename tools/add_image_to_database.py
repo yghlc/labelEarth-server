@@ -1,6 +1,7 @@
 import os,sys
 
-import sqlite3
+# import sqlite3
+import psycopg2
 
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -9,6 +10,7 @@ sys.path.insert(0, str(BASE_DIR.absolute()))
 
 # from imageObjects.models import Image    ## need setting of INSTALLED_APPS
 from tools.vectorData_io import get_centroid_imagebound_latlon
+import parameters
 
 def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image_object_path, cen_lat, cen_lon):
     # Preparing SQL queries to INSERT a record into the database.
@@ -59,7 +61,21 @@ def main():
     # print(image_names, image_paths, image_Bound, image_object_paths)
 
     # Connecting to sqlite
-    conn = sqlite3.connect(os.path.join(BASE_DIR,'db.sqlite3'))
+    # conn = sqlite3.connect(os.path.join(BASE_DIR,'db.sqlite3'))
+
+    # Connecting to postgreSQL
+    setting_file = os.path.join(BASE_DIR,'setting.ini')
+    database_name = parameters.get_string_parameters(setting_file,'database_name')
+    database_user = parameters.get_string_parameters(setting_file,'database_user')
+    database_password = parameters.get_string_parameters(setting_file,'database_password')
+    database_host = parameters.get_string_parameters(setting_file,'database_host')
+    database_port = parameters.get_string_parameters(setting_file,'database_port')
+    conn = psycopg2.connect(user=database_user,
+                                  password=database_password,
+                                  host=database_host,
+                                  port=database_port,
+                                  database=database_name)
+
 
     # Creating a cursor object using the cursor() method
     cursor = conn.cursor()
