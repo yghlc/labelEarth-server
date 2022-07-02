@@ -14,10 +14,18 @@ import parameters
 
 def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image_object_path, cen_lat, cen_lon):
     # Preparing SQL queries to INSERT a record into the database.
-    sql_str = 'INSERT INTO IMAGEOBJECTS_IMAGE(IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT , IMAGE_VALID_TIMES ,IMAGE_CEN_LAT, IMAGE_CEN_LON) VALUES ' \
-              '("%s", "%s","%s", "%s", 0, 0, "%f", "%f")'%(image_name,image_path, image_bound_path, image_object_path,cen_lat, cen_lon)
-    print(sql_str)
-    cursor.execute(sql_str)
+    # sql_str = 'INSERT INTO IMAGEOBJECTS_IMAGE(IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT , IMAGE_VALID_TIMES ,IMAGE_CEN_LAT, IMAGE_CEN_LON) VALUES ' \
+    #           '("%s", "%s","%s", "%s", 0, 0, "%f", "%f")'%(image_name,image_path, image_bound_path, image_object_path,cen_lat, cen_lon)
+    # print(sql_str)
+    # cursor.execute(sql_str)
+
+     # INSERT a record into the postgresql database.
+    # postgres_insert_query = """INSERT INTO IMAGEOBJECTS_IMAGE (IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT , IMAGE_VALID_TIMES ,IMAGE_CEN_LAT, IMAGE_CEN_LON) VALUES (%s, %s,%s,%s, 0, 0, %f, %f)"""
+    postgres_insert_query = " \"INSERT INTO imageObjects_image (IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT, IMAGE_VALID_TIMES, IMAGE_CEN_LAT, IMAGE_CENT_LONG) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);\" "
+    print(postgres_insert_query)
+    record_to_insert = (image_name,image_path, image_bound_path, image_object_path,0, 0, cen_lat, cen_lon)
+    cursor.execute(postgres_insert_query, record_to_insert)
+
 
 def insert_one_image_record_django(image_name,image_path,image_bound_path, image_object_path):
     img = Image(image_name=image_name,image_path=image_path,image_bound_path=image_bound_path,
