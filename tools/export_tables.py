@@ -13,51 +13,89 @@ from optparse import OptionParser
 import pandas as pd
 import json
 
+from datetime import datetime
+
+all_table_names = ['auth.user', 'imageObjects.image','imageObjects.userinput']
+
+def convert_json_to_excel(json_path, xlsx_path):
+    with open(json_path) as f_obj:
+        json_list = json.load(f_obj)
+    
+    print('\n record Count:', len(json_list))
+    # print(json_list[0])
+    records = {}
+    for rec in json_list:
+        if 'pk' in records.keys():
+            records['pk'].append(rec['pk'])
+        else:
+            records['pk'] = [rec['pk']]
+
+        
+        fields = rec['fields']
+        for key in fields.keys():
+            if key in records.keys():
+                records[key].append(fields[key])
+            else:
+                records[key] = [fields[key]]
+
+     # save to excel file
+    table_pd = pd.DataFrame(records)
+    with pd.ExcelWriter(xlsx_path) as writer:
+        table_pd.to_excel(writer) # sheet_name='training parameter and results'
+        # # set format
+        # workbook = writer.book
+        # format = workbook.add_format({'num_format': '#0.000'})
+        # train_out_table_sheet = writer.sheets['training parameter and results']
+        # train_out_table_sheet.set_column('O:P',None,format)
+
+
+
+def export_a_table(table_name, save_dir, save_table_name=None):
+    save_table_pre_name = save_table_name if save_table_name is not None else table_name.replace('.','-')
+    save_json = os.path.join(save_dir, '%s.json'%save_table_pre_name)
+    command_str = 'python manage.py dumpdata %s --indent 2 > %s'%(table_name,save_json)
+    res = os.system(command_str)
+    if res != 0:
+        sys.exit(res)
+    
+    save_xlsx = os.path.join(save_dir,'%s.xlsx'%save_table_pre_name)
+    # convert json to excel table
+    convert_json_to_excel(save_json,save_xlsx)
+    
+def test_convert_json_to_excel():
+    print(datetime.now(),'testing convert json excel')
+    save_json = 'imageObjects-image.json'
+    save_xlsx = 'output.xlsx'
+    convert_json_to_excel(save_json,save_xlsx)
+
 def main(options, args):
+    # test_convert_json_to_excel()
+    # sys.exit(1)
+    
+    # table_name = options.table_name 
+    table_name = args[0]
+    save_dir = options.save_dir if options.save_dir is not None else './'
+    export_tables = [ table_name ] if table_name is not None else all_table_names
+    for table in export_tables:
+        print(datetime.now(),'exporting %s'%table)
+        export_a_table(table, save_dir)
+
+
     pass
 
 if __name__ == '__main__':
-    usage = "usage: %prog [options] "
+    usage = "usage: %prog [options] table-name"
     parser = OptionParser(usage=usage, version="1.0 2021-10-11")
-    parser.description = 'Introduction: export tables from database to excel files'
+    parser.description = 'Introduction: export tables from database to excel files, table_names: imageObjects.image, auth.user, and imageObjects.userinput'
 
-    parser.add_option("-n", "--max_grids",
-                      action="store", dest="max_grids", type=int, default=200,
-                      help="the maximum number of grids for process in parallel, large storage allows large number")
+    # parser.add_option("-n", "--table_name",
+    #                   action="store", dest="table_name", default='imageObjects.image',
+    #                   help="the name of tables want to export, others: auth.user and imageObjects.userinput")
 
-    parser.add_option("-w", "--remote_working_dir",
-                      action="store", dest="remote_working_dir",
-                      help="the working directory in remote machine.")
+    parser.add_option("-d", "--save_dir",
+                      action="store", dest="save_dir",
+                      help="the directory to save the exported tables")
 
-    parser.add_option("-l", "--remote_log_dir",
-                      action="store", dest="remote_log_dir",
-                      help="the log directory in remote machine.")
-
-    parser.add_option("-p", "--process_node",
-                      action="store", dest="process_node",
-                      help="the username and machine for processing ")
-
-    parser.add_option("-d", "--download_node",
-                      action="store", dest="download_node",
-                      help="the username and machine for download ")
-
-    parser.add_option("", "--b_dont_remove_tmp_folders",
-                      action="store_false", dest="b_remove_tmp_folders", default=True,
-                      help="if set, then dont remove processing folders of each job")
-
-    parser.add_option("", "--b_dont_remove_DEM_files",
-                      action="store_false", dest="b_dont_remove_DEM_files", default=True,
-                      help="if set, then dont ArcticDEM (strip and mosaic) that have been processed")
-
-    parser.add_option("", "--b_no_slurm",
-                      action="store_true", dest="b_no_slurm", default=False,
-                      help="if set, dont submit a slurm job, run job using local machine ")
-
-    parser.add_option("", "--b_main_preProc",
-                      action="store_true", dest="b_main_preProc", default=False,
-                      help="if set, this computer is the main computer for pre-processing, "
-                           "only the main computer would divide a region into subsets, check completeness,"
-                           "the main computer must be run")
 
     (options, args) = parser.parse_args()
     if len(sys.argv) < 2 or len(args) < 1:
