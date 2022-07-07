@@ -21,7 +21,7 @@ def insert_one_image_record(cursor,image_name,image_path,image_bound_path, image
 
      # INSERT a record into the postgresql database.
     # postgres_insert_query = """INSERT INTO IMAGEOBJECTS_IMAGE (IMAGE_NAME, IMAGE_PATH, IMAGE_BOUND_PATH, IMAGE_OBJECT_PATH, CONCURRENT_COUNT , IMAGE_VALID_TIMES ,IMAGE_CEN_LAT, IMAGE_CEN_LON) VALUES (%s, %s,%s,%s, 0, 0, %f, %f)"""
-    postgres_insert_query = 'INSERT INTO  \"imageObjects_image\" (image_name, image_path, image_object_path, image_bound_path, concurrent_count, image_valid_times, image_cen_lat, image_cen_lon) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); '
+    postgres_insert_query = 'INSERT INTO  \"imageObjects_image\" (image_name, image_path, image_bound_path, image_object_path, concurrent_count, image_valid_times, image_cen_lat, image_cen_lon) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); '
     print(postgres_insert_query)
     record_to_insert = (image_name,image_path, image_bound_path, image_object_path,0, 0, cen_lat, cen_lon)
     cursor.execute(postgres_insert_query, record_to_insert)
