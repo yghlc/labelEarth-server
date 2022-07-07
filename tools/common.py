@@ -171,28 +171,21 @@ def calculate_user_contribution(user_name):
     # print('unique_user_ids:',unique_user_ids)
     total_user = len(unique_user_ids)
     # total_save = q_saved.count()
+    # calculate the rank of the user
     select_user_contri = q_saved.filter(user_name_id=user_name_id).count()
-    if select_user_contri > 0:
-        unique_user_ids.remove(user_name_id)
-    else:
+    if select_user_contri < 1:
         return total_count, select_user_contri, total_user, None
-
-    other_contribute = {}
-    other_contribute_list = []
+    contribute_per_user =[]
     for user_id in unique_user_ids:
         count = q_saved.filter(user_name_id = user_id).count()
-        other_contribute[user_id] = count
-        other_contribute_list.append(count)
-    # get rank
-    other_contribute_list = sorted(other_contribute_list,reverse=True) # from large to small
-    # print(other_contribute_list)
-    rank = 1
-    for idx, num in enumerate(other_contribute_list):
-        if select_user_contri < num:
+        count_per_user = {'user_id':user_id,'count':count}
+        contribute_per_user.append(count_per_user)
+    contribute_per_user_sorted = sorted(contribute_per_user, key=lambda x:x['count'], reverse=True)
+    for idx, item in enumerate(contribute_per_user_sorted):
+        if item['user_id'] == user_name_id:
             rank = idx + 1
+            return total_count, select_user_contri, total_user, rank
 
-    # total image count,  user contribute count, total number of users with contribution,  rank.
-    return total_count, select_user_contri, total_user, rank
 
 
 if __name__ == '__main__':
