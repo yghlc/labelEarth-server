@@ -186,6 +186,7 @@ def submitImageObjects(request,user_name):
     if request.method == 'POST':
         # print('\n I just send a POST request \n')
         # print('request.POST:',request.POST)
+        # logger.info('request.POST: %s',str(request.POST))
         input_form = submitObjectForm(request.POST)
         # print('input_form.is_valid()',input_form.is_valid())
         logger.info('%s submit a POST request'%user_name)
@@ -204,19 +205,21 @@ def submitImageObjects(request,user_name):
                 return image_rec
             # print("user_rec:",user_rec)
             # print("image_rec:",image_rec)
-            # if UserInput.objects.filter(user_name_id=user_rec.id, image_name_id=image_rec.id).exists():
-            with transaction.atomic():
-                user_inpu_rec = UserInput.objects.select_for_update().get(user_name_id=user_rec.id, image_name_id=image_rec.id)
-                user_inpu_rec.save_time = datetime.now()
-                # user_inpu_rec.user_image_output = 'test.geojson'
-                user_inpu_rec.possibility = possibility
-                user_inpu_rec.user_note = user_note
-                user_inpu_rec.save()
-            # else:
-            #     user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
-            #                           user_image_output='test.geojson',save_time=datetime.now(),
-            #                           possibility=possibility,user_note=user_note)
-            #     user_inpu_rec.save()
+            if UserInput.objects.filter(user_name_id=user_rec.id, image_name_id=image_rec.id).exists():
+                with transaction.atomic():
+                    user_inpu_rec = UserInput.objects.select_for_update().get(user_name_id=user_rec.id, image_name_id=image_rec.id)
+                    user_inpu_rec.save_time = datetime.now()
+                    # user_inpu_rec.user_image_output = 'test.geojson'
+                    user_inpu_rec.possibility = possibility
+                    user_inpu_rec.user_note = user_note
+                    user_inpu_rec.save()
+            else:
+                # a record should be created when get an image
+                return HttpResponse('input with user: %s and image: %s does not exist' % (user_name, image_name))
+                # user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
+                #                       user_image_output='test.geojson',save_time=datetime.now(),
+                #                       possibility=possibility,user_note=user_note)
+                # user_inpu_rec.save()
             # updated one record for images
             with transaction.atomic():
                 image_rec_update = Image.objects.select_for_update().get(image_name=image_name)
