@@ -17,11 +17,13 @@ from django.contrib.messages import constants as messages
 BASE_DIR = Path(__file__).resolve().parent.parent
 import parameters
 
+setting_file = os.path.join(BASE_DIR,'setting.ini')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x-j32wbart2&i=6&d0wcg$93nvz+5s)t=mbb_kht61h9dx_!$g'
+SECRET_KEY = parameters.get_string_parameters(setting_file,'secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -98,7 +100,6 @@ WSGI_APPLICATION = 'labelEarthServer.wsgi.application'
 #     }
 # }
 
-setting_file = os.path.join(BASE_DIR,'setting.ini')
 database_engine = parameters.get_string_parameters(setting_file,'database_engine')
 database_name = parameters.get_string_parameters(setting_file,'database_name')
 database_user = parameters.get_string_parameters(setting_file,'database_user')
@@ -164,7 +165,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'visual/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
