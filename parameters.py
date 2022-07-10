@@ -49,6 +49,46 @@ def get_string_parameters_None_if_absence(parafile,name):
     else:
         return result
 
+def get_bool_parameters_None_if_absence(parafile,name):
+    if parafile =='':
+        parafile = saved_parafile_path
+    result = read_Parameters_file(parafile,name)
+    if result is False or len(result) < 1:
+        return None
+    if result.upper()=='YES':
+        return True
+    else:
+        return False
+
+def get_bool_parameters(parafile,name):
+    value = get_bool_parameters_None_if_absence(parafile,name)
+    if value is None:
+        raise ValueError(' %s not set in %s' % (name, parafile))
+    return value
+
+def get_digit_parameters_None_if_absence(parafile,name,datatype):
+    if parafile =='':
+        parafile = saved_parafile_path
+    result = read_Parameters_file(parafile,name)
+    if result is False or len(result) < 1:
+        return None
+    try:
+        if datatype == 'int':
+            digit_value = int(result)
+        else:
+            digit_value = float(result)
+    except ValueError:
+            raise ValueError('convert %s to digit failed , exit'%(name))
+
+    return digit_value
+
+def get_digit_parameters(parafile,name,datatype):
+    value = get_digit_parameters_None_if_absence(parafile, name, datatype)
+    if value is None:
+        raise ValueError(' %s not set in %s'%(name, parafile))
+    return value
+
+
 def test_readparamters():
     parafile = 'setting.ini'
 
