@@ -25,12 +25,21 @@ setting_file = os.path.join(BASE_DIR,'setting.ini')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = parameters.get_string_parameters(setting_file,'secret_key')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECURE_HSTS_SECONDS = parameters.get_digit_parameters(setting_file,'SECURE_HSTS_SECONDS','int')
+SECURE_HSTS_INCLUDE_SUBDOMAINS = parameters.get_bool_parameters(setting_file,'SECURE_HSTS_INCLUDE_SUBDOMAINS')
+SECURE_HSTS_PRELOAD = parameters.get_bool_parameters(setting_file,'SECURE_HSTS_PRELOAD')
 
-ALLOWED_HOSTS = ['10.0.0.141',
-                 '127.0.0.1',
-                 '*']   # for all, during development.
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = parameters.get_bool_parameters(setting_file,'DEBUG')
+
+SECURE_SSL_REDIRECT = parameters.get_bool_parameters(setting_file,'SECURE_SSL_REDIRECT')
+SESSION_COOKIE_SECURE = parameters.get_bool_parameters(setting_file,'SESSION_COOKIE_SECURE')
+CSRF_COOKIE_SECURE = parameters.get_bool_parameters(setting_file,'CSRF_COOKIE_SECURE')
+
+host_name = parameters.get_string_parameters(setting_file,'host_name')
+ALLOWED_HOSTS = ['127.0.0.1',
+                 host_name]   # ['*']
+
 MESSAGE_TAGS = {
         messages.DEBUG: 'alert-secondary',
         messages.INFO: 'alert-info',
