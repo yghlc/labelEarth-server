@@ -152,6 +152,10 @@ sudo -u postgres psql                         # login to postgresql
 \c thawslump_db                             # connect to the database
 \dt                                        # show tables
 SELECT * FROM public.auth_user;             # show all rows in the table "auth_user"
+
+#when table name contain both upper and lower letter, need to use double-quotes to
+#delimit identifiers so you can use the specific mixed-case spelling
+SELECT * FROM "imageObjects_image"; 
 \q                                          # quit
 ```
 
