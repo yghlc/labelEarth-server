@@ -40,7 +40,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Create your views here.
 def index(request):
-    return HttpResponse('Hello, please use additional terms to get or send data!')
+    domain = request.build_absolute_uri('/')[:-1]
+    login_url= domain + '/user/login'
+    # return HttpResponse('Hello, please use additional terms to get or send data!')
+    return HttpResponse('Hello, please <a href=%s>login (create an account if need)</a>, then start identifying thaw slumps!'%login_url)
 
 def getItemOfImageObject(request):
     ''' get one available item: image, and return image_name '''

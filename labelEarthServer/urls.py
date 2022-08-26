@@ -17,8 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
+from django.views.generic import RedirectView
+from django.urls import reverse_lazy
+
 
 urlpatterns = [
+    path('',RedirectView.as_view(url=reverse_lazy('index'), permanent=False)),
     path('imageObjects/',include('imageObjects.urls')),
     path('user/',include('userManage.urls')),
     path('admin/', admin.site.urls),
