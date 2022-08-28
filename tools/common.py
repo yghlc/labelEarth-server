@@ -98,15 +98,15 @@ def get_previous_item(user_name,current_image):
     # get previous image that a user submitted, user_name is required
     user_name_id = get_user_id(user_name)
     if user_name_id is None:
-        return None
+        return None, None, None,None
     current_image_id = get_image_id(current_image)
     if current_image_id is None:
-        return None
+        return None, None, None,None
 
     # all input from the user
     query_user = UserInput.objects.filter(user_name_id=user_name_id)
     if len(query_user) < 1:
-        return None
+        return None, None, None,None
 
     # to make sure the user dont work on the same image
     checked_image_ids = [item.image_name_id for item in query_user]
@@ -114,7 +114,7 @@ def get_previous_item(user_name,current_image):
     current_idx = checked_image_ids.index(current_image_id)
     if current_idx == 0:
         # previous_image_id = checked_image_ids[0]
-        return None  # current one is the first one
+        return None, None, None,None  # current one is the first one
     else:
         previous_image_id = checked_image_ids[current_idx-1]
         rec_img = Image.objects.filter(id=previous_image_id)[0]
