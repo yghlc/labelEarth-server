@@ -109,7 +109,7 @@ def getPreviousImageObject_user(request,user_name,image_name):
                   'user_rank': None}
 
     pre_image_name, possibility,user_note, edit_polygons = get_previous_item(user_name,image_name)
-    print(pre_image_name, possibility,user_note)
+    print('pre_image_name, possibility,user_note:',pre_image_name, possibility,user_note)
     if pre_image_name is not None:
         image_info['image_name'] = pre_image_name
         one_record, b_success = get_one_record_image(pre_image_name)
@@ -123,6 +123,8 @@ def getPreviousImageObject_user(request,user_name,image_name):
             image_info['user_note'] = user_note
         if edit_polygons is not None and edit_polygons != 'test.geojson':
             image_info['edit_polygons'] = edit_polygons
+
+        logger.info('user: %s got an image that has been checked previously' % str(user_name))
     else:
         image_info['image_name'] = 'NotAvailable'
         image_info['image_center_lat'] = image_info['image_center_lon'] = 0
@@ -135,7 +137,6 @@ def getPreviousImageObject_user(request,user_name,image_name):
         image_info['total_user'] = total_user
         image_info['user_rank'] = user_rank
 
-    logger.info('user: %s got an image that has been checked previously' % str(user_name))
     return JsonResponse(image_info)
 
 
