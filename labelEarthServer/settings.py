@@ -152,10 +152,10 @@ INTERNAL_IPS = [
 
 # allow CORS ORIGIN
 CORS_ORIGIN_ALLOW_ALL  = False
-CORS_ORIGIN_WHITELIST  =  [
-    "https://yghlc.github.io",
-    "http://localhost:63343",
-]
+# CORS_ORIGIN_WHITELIST  =  [
+#     "https://yghlc.github.io",
+#     "http://localhost:63343",
+# ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
