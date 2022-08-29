@@ -175,7 +175,8 @@ def getEditedObjects(request,user_name,image_name):
         return user_input_rec
     geojson = os.path.join(BASE_DIR,user_input_rec.user_image_output)
     if os.path.exists(geojson) is False:
-        return HttpResponse('error: %s does not exsit'%geojson)
+        logger.error('error: %s does not exist'%geojson)
+        return HttpResponse('error: %s does not exist'%geojson)
 
     with open(geojson) as f_obj:
         data = json.load(f_obj)
@@ -219,6 +220,7 @@ def submitImageObjects(request,user_name):
                     user_inpu_rec.save()
             else:
                 # a record should be created when get an image
+                logger.error('input with user: %s and image: %s does not exist' % (user_name, image_name))
                 return HttpResponse('input with user: %s and image: %s does not exist' % (user_name, image_name))
                 # user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
                 #                       user_image_output='test.geojson',save_time=datetime.now(),
@@ -233,13 +235,16 @@ def submitImageObjects(request,user_name):
 
             # get the next image for user to check
             # return HttpResponseRedirect(reverse('index'))
+            logger.info('save the input from %s for image: %s successfully'%(user_name,image_name))
             return HttpResponse('save the input from %s for image: %s successfully'%(user_name,image_name))
         else:
+            logger.error('Thank you, I got a POST request, but it is invalid')
             return HttpResponse('Thank you, I got a POST request, but it is invalid')
             # return HttpResponseRedirect(reverse('index'))
     else:
         pass
 
+    logger.info('Hello, this is submitImageObjects.')
     return HttpResponse('Hello, this is submitImageObjects.')
 
 @csrf_exempt
@@ -271,6 +276,8 @@ def savePolygons(request,user_name,image_name):
             user_input_rec.user_image_output = rel_path
             user_input_rec.save()
 
+        logger.info('Saving polygons OK!')
         return HttpResponse('Saving polygons OK!')
     else:
+        logger.info('This is savePolygons.')
         return HttpResponse('This is savePolygons.')
