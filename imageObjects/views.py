@@ -183,23 +183,93 @@ def getEditedObjects(request,user_name,image_name):
     logger.info('request the user:%s added or edited polygons for %s' % (user_name,image_name))
     return JsonResponse(data)
 
+# # csrf_exempt to remove the requiement of CSRF COOKIE
+# @csrf_exempt
+# def submitImageObjects(request,user_name):
+#     '''submit object information for an image'''
+#     # print('\n In submitImageObjects \n')
+#     if request.method == 'POST':
+#         # print('\n I just send a POST request \n')
+#         # print('request.POST:',request.POST)
+#         # logger.info('request.POST: %s',str(request.POST))
+#         input_form = submitObjectForm(request.POST)
+#         # print('input_form.is_valid()',input_form.is_valid())
+#         logger.info('%s submit a POST request'%user_name)
+#         if input_form.is_valid():
+#             # print(input_form)     # it output a html string
+#             image_name = input_form.cleaned_data['image_name']
+#             possibility = input_form.cleaned_data['possibility']
+#             user_note = input_form.cleaned_data['user_note']
+#             # print('image_name after clean is:', image_name)
+#             # save one record
+#             user_rec, b_success = get_one_record_user(user_name)
+#             if b_success is False:
+#                 return user_rec
+#             image_rec, b_success = get_one_record_image(image_name)
+#             if b_success is False:
+#                 return image_rec
+#             # print("user_rec:",user_rec)
+#             # print("image_rec:",image_rec)
+#             if UserInput.objects.filter(user_name_id=user_rec.id, image_name_id=image_rec.id).exists():
+#                 with transaction.atomic():
+#                     user_inpu_rec = UserInput.objects.select_for_update().get(user_name_id=user_rec.id, image_name_id=image_rec.id)
+#                     user_inpu_rec.save_time = datetime.now()
+#                     # user_inpu_rec.user_image_output = 'test.geojson'
+#                     user_inpu_rec.possibility = possibility
+#                     user_inpu_rec.user_note = user_note
+#                     user_inpu_rec.save()
+#             else:
+#                 # a record should be created when get an image
+#                 logger.error('input with user: %s and image: %s does not exist' % (user_name, image_name))
+#                 return HttpResponse('input with user: %s and image: %s does not exist' % (user_name, image_name))
+#                 # user_inpu_rec = UserInput(user_name=user_rec,image_name=image_rec,
+#                 #                       user_image_output='test.geojson',save_time=datetime.now(),
+#                 #                       possibility=possibility,user_note=user_note)
+#                 # user_inpu_rec.save()
+#             # updated one record for images
+#             with transaction.atomic():
+#                 image_rec_update = Image.objects.select_for_update().get(image_name=image_name)
+#                 image_rec_update.image_valid_times += 1
+#                 image_rec_update.concurrent_count = max(image_rec_update.concurrent_count-1,0)
+#                 image_rec_update.save()
+#
+#             # get the next image for user to check
+#             # return HttpResponseRedirect(reverse('index'))
+#             logger.info('save the input from %s for image: %s successfully'%(user_name,image_name))
+#             return HttpResponse('save the input from %s for image: %s successfully'%(user_name,image_name))
+#         else:
+#             logger.error('Thank you, I got a POST request, but it is invalid')
+#             return HttpResponse('Thank you, I got a POST request, but it is invalid')
+#             # return HttpResponseRedirect(reverse('index'))
+#     else:
+#         pass
+#
+#     logger.info('Hello, this is submitImageObjects.')
+#     return HttpResponse('Hello, this is submitImageObjects.')
+
+
+
 # csrf_exempt to remove the requiement of CSRF COOKIE
 @csrf_exempt
 def submitImageObjects(request,user_name):
     '''submit object information for an image'''
     # print('\n In submitImageObjects \n')
     if request.method == 'POST':
-        # print('\n I just send a POST request \n')
-        # print('request.POST:',request.POST)
-        # logger.info('request.POST: %s',str(request.POST))
-        input_form = submitObjectForm(request.POST)
-        # print('input_form.is_valid()',input_form.is_valid())
-        logger.info('%s submit a POST request'%user_name)
-        if input_form.is_valid():
+        # print(request.body)
+        try:
+            data = json.loads(request.body)  # request.body is a string
+        except Exception as e:
+            logger.error('form data from user: %s json.loads: %s' % (user_name, e))
+            return HttpResponse('form data, json.loads: error: %s' % e)
+
+        logger.info('%s submit a POST request (form) via json string'%user_name)
+        logger.info(request.body)
+        logger.info(str(data))
+        if 'image_name' in data.keys() and 'possibility' in data.keys() and 'user_note' in data.keys():
             # print(input_form)     # it output a html string
-            image_name = input_form.cleaned_data['image_name']
-            possibility = input_form.cleaned_data['possibility']
-            user_note = input_form.cleaned_data['user_note']
+            image_name = data['image_name']
+            possibility = data['possibility']
+            user_note = data['user_note']
             # print('image_name after clean is:', image_name)
             # save one record
             user_rec, b_success = get_one_record_user(user_name)
