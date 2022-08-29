@@ -263,7 +263,7 @@ def submitImageObjects(request,user_name):
             return HttpResponse('form data, json.loads: error: %s' % e)
 
         logger.info('%s submit a POST request (form) via json string'%user_name)
-        logger.info(request.body)
+        # logger.info(request.body)
         logger.info(str(data))
         if 'image_name' in data.keys() and 'possibility' in data.keys() and 'user_note' in data.keys():
             # print(input_form)     # it output a html string
