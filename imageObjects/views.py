@@ -254,6 +254,7 @@ def getEditedObjects(request,user_name,image_name):
 def submitImageObjects(request,user_name):
     '''submit object information for an image'''
     # print('\n In submitImageObjects \n')
+    logger.info('%s call submitImageObjects ' % user_name)
     if request.method == 'POST':
         # print(request.body)
         try:
