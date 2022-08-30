@@ -235,8 +235,8 @@ def getEditedObjects(request,user_name,image_name):
 #
 #             # get the next image for user to check
 #             # return HttpResponseRedirect(reverse('index'))
-#             logger.info('save the input from %s for image: %s successfully'%(user_name,image_name))
-#             return HttpResponse('save the input from %s for image: %s successfully'%(user_name,image_name))
+#             logger.info('success: save the input from %s for image: %s '%(user_name,image_name))
+#             return HttpResponse('success: save the input from %s for image: %s '%(user_name,image_name))
 #         else:
 #             logger.error('Thank you, I got a POST request, but it is invalid')
 #             return HttpResponse('Thank you, I got a POST request, but it is invalid')
@@ -306,8 +306,8 @@ def submitImageObjects(request,user_name):
 
             # get the next image for user to check
             # return HttpResponseRedirect(reverse('index'))
-            logger.info('save the input from %s for image: %s successfully'%(user_name,image_name))
-            return HttpResponse('save the input from %s for image: %s successfully'%(user_name,image_name))
+            logger.info('success: save the input from %s for image: %s'%(user_name,image_name))
+            return HttpResponse('success: save the input from %s for image: %s'%(user_name,image_name))
         else:
             logger.error('Thank you, I got a POST request, but it is invalid')
             return HttpResponse('Thank you, I got a POST request, but it is invalid')
