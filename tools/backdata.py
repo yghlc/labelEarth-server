@@ -19,7 +19,12 @@ back_files = ['labelEarthServer_db.json','admin.json','imageObjects.json','image
 def is_two_file_different(file1,file2):
     # deep comparison: where the content of the files are compared.
     # True if the files are the same, False otherwise.
+    print('comparing %s and %s'%(file1, file2))
     result = filecmp.cmp(file1, file2, shallow=False)
+    if result:
+        print(' %s and %s is the same'%(file1, file2))
+    else:
+        print(' %s and %s is different' % (file1, file2))
     return not result   # return not the same (different)
 
 def get_latest_bak(file_name):
@@ -45,6 +50,7 @@ def main():
         if bak is None or is_two_file_different(bak,file):
             # backup
             new_bak = get_save_bak_name(file)
+            print('copy %s to %s'%(file,new_bak))
             shutil.copy(file, new_bak)
 
 
