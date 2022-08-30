@@ -157,6 +157,8 @@ CORS_ORIGIN_ALLOW_ALL  = False
 #     "http://localhost:63343",
 # ]
 
+# set this to avoid the warning of "The Cross-Origin-Opener-Policy header has been ignored", although it's not good
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'unsafe-none'
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
