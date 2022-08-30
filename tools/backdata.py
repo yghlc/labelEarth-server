@@ -22,9 +22,9 @@ def is_two_file_different(file1,file2):
     print('comparing %s and %s'%(file1, file2))
     result = filecmp.cmp(file1, file2, shallow=False)
     if result:
-        print(' %s and %s is the same'%(file1, file2))
+        print(' they are the same')
     else:
-        print(' %s and %s is different' % (file1, file2))
+        print(' they are different')
     return not result   # return not the same (different)
 
 def get_latest_bak(file_name):
