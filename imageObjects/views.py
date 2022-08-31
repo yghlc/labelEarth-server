@@ -352,3 +352,27 @@ def savePolygons(request,user_name,image_name):
     else:
         logger.info('This is savePolygons.')
         return HttpResponse('This is savePolygons.')
+
+def manuUpdateDatabase(request,user_name):
+    # testing from postman or others, will modify tables: imageObjects_userinput and imageObjects_image.
+    # after removing testing records in imageObjects_userinput, some values (image_valid_times) in imageObjects_image
+    # is incorrect.
+
+    # manually call this from browser or postman, either via GET or POST, then
+    # re-calculate some values in imageObjects_image after removing records in "imageObjects_userinput"
+
+    logger.info('%s call manuUpdateDatabase ' % user_name)
+
+    # update image_valid_times of each images
+    q_saved = UserInput.objects.exclude(possibility=None)
+    unique_image_ids = list(q_saved.values_list('image_name_id', flat=True).distinct())
+    image_count = len(unique_image_ids)
+    for image_id in unique_image_ids:
+        valid_image_count = q_saved.filter(image_name_id=image_id).count()
+        # updated one record for images
+        with transaction.atomic():
+            image_rec_update = Image.objects.select_for_update().get(id=image_id)
+            image_rec_update.image_valid_times = valid_image_count
+            image_rec_update.save()
+
+    return HttpResponse('success: update image_valid_times for %d images.'%image_count)

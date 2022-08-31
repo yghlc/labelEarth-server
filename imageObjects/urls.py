@@ -16,5 +16,6 @@ urlpatterns = [
     path('<str:user_name>/imageobject/<str:image_name>',views.getEditedObjects, name='getImageObjects'),
     # user submit a result, post request
     path('<str:user_name>/submitImageObjects',views.submitImageObjects, name='submitImageObjects'),
-    path('<str:user_name>/savePolygons/<str:image_name>',views.savePolygons, name='savePolygons')
+    path('<str:user_name>/savePolygons/<str:image_name>',views.savePolygons, name='savePolygons'),
+    path('<str:user_name>/manuUpdateDatabase',views.manuUpdateDatabase, name='manuUpdateDatabase'),
 ]
