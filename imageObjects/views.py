@@ -363,16 +363,16 @@ def manuUpdateDatabase(request,user_name):
 
     logger.info('%s call manuUpdateDatabase ' % user_name)
 
-    # update image_valid_times of each images
+    # update image_valid_times of each image
+    # set image_valid_times some images as 0, if their corresponding input has been remove from "imageObjects_userinput"
     q_saved = UserInput.objects.exclude(possibility=None)
-    unique_image_ids = list(q_saved.values_list('image_name_id', flat=True).distinct())
-    image_count = len(unique_image_ids)
-    for image_id in unique_image_ids:
-        valid_image_count = q_saved.filter(image_name_id=image_id).count()
-        # updated one record for images
-        with transaction.atomic():
-            image_rec_update = Image.objects.select_for_update().get(id=image_id)
-            image_rec_update.image_valid_times = valid_image_count
-            image_rec_update.save()
+
+    with transaction.atomic():
+        q_image_valid = Image.objects.select_for_update().filter(image_valid_times__gt=0)
+        image_count = len(q_image_valid)
+        for one_q in q_image_valid:
+            one_q.image_valid_times = q_saved.filter(image_name_id=one_q.id).count()
+            one_q.save()
+
 
     return HttpResponse('success: update image_valid_times for %d images.'%image_count)
