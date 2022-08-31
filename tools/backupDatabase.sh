@@ -18,3 +18,6 @@ python manage.py dumpdata imageObjects --indent 2 > imageObjects.json
 
 python manage.py dumpdata imageObjects.image --indent 2 > image.json
 python manage.py dumpdata imageObjects.userinput --indent 2 > userinput.json
+
+# copy backup files
+python ./tools/backdata.py
