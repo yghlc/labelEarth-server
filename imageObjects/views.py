@@ -338,6 +338,7 @@ def savePolygons(request,user_name,image_name):
         save_file_path = os.path.join(BASE_DIR,rel_path)
         # don't replace the old file if it exists
         save_file_path = get_a_new_filename(save_file_path)
+        rel_path = os.path.join('data','objectPolygons', os.path.basename(save_file_path)) # update relative path
         with open(save_file_path,'w') as f_obj:
             json.dump(data,f_obj)
 
