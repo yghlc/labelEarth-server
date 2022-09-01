@@ -4,15 +4,22 @@
 
 {% load crispy_forms_tags %}
 
-<!--Login--> 
+    <p class="text-left">
+       No registration or password is required. Please input your email and make sure it's correct, so we can keep you updated on this dataset and system.
+    </p>
+
+<!--Login-->
 <div class="container py-5">
   <h1>Login</h1>
   <form method="POST">
     {% csrf_token %}
-    {{ login_form|crispy }}
+         <!-- email field -->
+        <label for="id_login">Email</label>
+        <input id="id_login" name="login_email" type="email" >
+
     <button class="btn btn-primary" type="submit">Login</button>
   </form>
-  <p class="text-center">Don't have an account? <a href="register">Create an account</a>.</p>
+{#  <p class="text-center">Don't have an account? <a href="register">Create an account</a>.</p>#}
 </div>
 
 

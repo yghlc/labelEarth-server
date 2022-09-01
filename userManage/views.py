@@ -3,6 +3,7 @@ from .forms import NewUserForm
 from django.contrib.auth import login,authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import QueryDict
 
 from django.http import HttpResponse
 
@@ -32,20 +33,46 @@ def register_request(request):
 
 def login_request(request):
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                # login(request, user)
-                # messages.info(request, f"You are now logged in as {username}.")
-                return redirect("/visual/index.html?username=%s"%username)
+        # print('login_email is',request.POST['login_email'])
+        username = request.POST['login_email']  # treat email as user name
+        username = username.lower()
+        if User.objects.filter(username=username).exists() is False:
+            # save the email to database
+            # ("username", "email", "password1", "password2")
+            q_dict = QueryDict('username=%s&email=%s&password1=%s&password2=%s'%(username,username,'password_123A','password_123A'), mutable=True)
+            # print(q_dict)
+            form = NewUserForm(q_dict)
+            # print('form:',form)
+            if form.is_valid():
+                user = form.save()
+                messages.success(request, "Save a new email to database successful.")
+                print("Save a new email to database successful.")
             else:
-                messages.error(request, "Invalid username or password.")
+                # output log
+                messages.error(request, form.errors)
+                print('messages.error:',form.errors)
         else:
-            messages.error(request, "Invalid username or password.")
-            return render(request=request, template_name="userManage/login.html", context={"login_form": form})
+            # output log
+            print('%s already in the database'%username)
+
+        return redirect("/visual/index.html?username=%s" % username)
+
+
+        #################### login need user name and password
+        # form = AuthenticationForm(request, data=request.POST)
+        # if form.is_valid():
+        #     username = form.cleaned_data.get('username')
+        #     password = form.cleaned_data.get('password')
+        #     user = authenticate(username=username, password=password)
+        #     if user is not None:
+        #         # login(request, user)
+        #         # messages.info(request, f"You are now logged in as {username}.")
+        #         return redirect("/visual/index.html?username=%s"%username)
+        #     else:
+        #         messages.error(request, "Invalid username or password.")
+        # else:
+        #     messages.error(request, "Invalid username or password.")
+        #     return render(request=request, template_name="userManage/login.html", context={"login_form": form})
 
     form = AuthenticationForm()
     return render(request=request, template_name="userManage/login.html", context={"login_form": form})
