@@ -5,6 +5,10 @@
 {% load crispy_forms_tags %}
 
     <p class="text-left">
+       This is a crowd-sourcing system for validating retrogressive thaw slumps, one kind of permafrost thawing, identified from over 200 TB of ArcticDEM using deep learning, please find details at
+        <a href=https://yghlc.github.io/validate-thaw-slump/>Link.</a> The system is maintained by <a href=https://cires.colorado.edu/visiting-fellow/lingcao-huang>Lingcao Huang.</a>
+    </p>
+    <p class="text-left">
        No registration or password is required. Please input your email and make sure it's correct, so we can keep you updated on this dataset and system.
     </p>
 
@@ -14,7 +18,7 @@
   <form method="POST">
     {% csrf_token %}
          <!-- email field -->
-        <label for="id_login">Email</label>
+        <label for="id_login">Email:</label>
         <input id="id_login" name="login_email" type="email" >
 
     <button class="btn btn-primary" type="submit">Login</button>

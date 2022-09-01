@@ -4,6 +4,7 @@ from django.contrib.auth import login,authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import QueryDict
+from django.contrib.auth.models import User
 
 from django.http import HttpResponse
 
@@ -34,19 +35,20 @@ def register_request(request):
 def login_request(request):
     if request.method == "POST":
         # print('login_email is',request.POST['login_email'])
-        username = request.POST['login_email']  # treat email as user name
-        username = username.lower()
+        user_email = request.POST['login_email']
+        username = user_email.lower()   # treat email as the username
         if User.objects.filter(username=username).exists() is False:
             # save the email to database
             # ("username", "email", "password1", "password2")
-            q_dict = QueryDict('username=%s&email=%s&password1=%s&password2=%s'%(username,username,'password_123A','password_123A'), mutable=True)
+            password = User.objects.make_random_password()
+            q_dict = QueryDict('username=%s&email=%s&password1=%s&password2=%s'%(username,user_email,password,password), mutable=True)
             # print(q_dict)
             form = NewUserForm(q_dict)
             # print('form:',form)
             if form.is_valid():
                 user = form.save()
-                messages.success(request, "Save a new email to database successful.")
-                print("Save a new email to database successful.")
+                messages.success(request, "success: save a new email to database.")
+                print("success: save a new email to database.")
             else:
                 # output log
                 messages.error(request, form.errors)
