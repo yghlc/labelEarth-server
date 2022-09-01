@@ -47,15 +47,15 @@ def login_request(request):
             # print('form:',form)
             if form.is_valid():
                 user = form.save()
-                messages.success(request, "success: save a new email to database.")
-                print("success: save a new email to database.")
+                messages.success(request, "success: save a new email (%s) to database."%user_email)
+                print("success: save a new email (%s) to database."%user_email)
             else:
                 # output log
                 messages.error(request, form.errors)
                 print('messages.error:',form.errors)
         else:
             # output log
-            print('%s already in the database'%username)
+            print('%s already in the database'%user_email)
 
         return redirect("/visual/index.html?username=%s" % username)
 
