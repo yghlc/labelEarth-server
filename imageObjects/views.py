@@ -21,6 +21,7 @@ from tools.common import calculate_user_contribution
 from tools.common import update_concurrent_count
 from tools.common import remove_invalid_userinput
 from tools.common import get_previous_item
+from tools.common import get_a_new_filename
 
 
 max_valid_times = 3     # each image should only be valided less than 3 times.
@@ -335,7 +336,8 @@ def savePolygons(request,user_name,image_name):
         # save to database
         rel_path = os.path.join('data','objectPolygons','%s_by_%s.geojson'%(image_name,user_name))
         save_file_path = os.path.join(BASE_DIR,rel_path)
-        # replace the old file if it exists
+        # don't replace the old file if it exists
+        save_file_path = get_a_new_filename(save_file_path)
         with open(save_file_path,'w') as f_obj:
             json.dump(data,f_obj)
 

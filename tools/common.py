@@ -1,3 +1,5 @@
+import os.path
+
 from django.http import HttpResponse
 from imageObjects.models import Image
 from django.contrib.auth.models import User
@@ -186,6 +188,18 @@ def calculate_user_contribution(user_name):
             rank = idx + 1
             return total_count, select_user_contri, total_user, rank
 
+
+def get_a_new_filename(file_path):
+    # get a new filename at the same directory if the old one already exists
+    if os.path.isfile(file_path) is False:
+        return file_path
+    else:
+        dir_filename, ext = os.path.splitext(file_path)
+        for idx in range(1000):
+            bak_name = dir_filename + '_' + str(idx).zfill(3) + ext
+            if os.path.isfile(bak_name):
+                continue
+            return bak_name
 
 
 if __name__ == '__main__':
