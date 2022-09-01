@@ -22,7 +22,7 @@ from django.urls import reverse_lazy
 
 
 urlpatterns = [
-    path('',RedirectView.as_view(url=reverse_lazy('index'), permanent=False)),
+    path('',RedirectView.as_view(url=reverse_lazy('login'), permanent=False)),
     path('imageObjects/',include('imageObjects.urls')),
     path('user/',include('userManage.urls')),
     path('admin/', admin.site.urls),
