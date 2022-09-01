@@ -105,13 +105,15 @@ def get_previous_item(user_name,current_image):
     if current_image_id is None:
         return None, None, None,None
 
-    # all input from the user
-    query_user = UserInput.objects.filter(user_name_id=user_name_id)
-    if len(query_user) < 1:
+    # all valid input (possibility!=None) from the user
+    query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None)
+    if len(query_userinput) < 1:
         return None, None, None,None
 
     # to make sure the user dont work on the same image
-    checked_image_ids = [item.image_name_id for item in query_user]
+    checked_image_ids = [item.image_name_id for item in query_userinput]
+    if current_image_id not in checked_image_ids:
+        checked_image_ids.append(current_image_id)      # add current id if it's not in before sorted
     checked_image_ids = sorted(checked_image_ids)
     current_idx = checked_image_ids.index(current_image_id)
     if current_idx == 0:
@@ -120,7 +122,8 @@ def get_previous_item(user_name,current_image):
     else:
         previous_image_id = checked_image_ids[current_idx-1]
         rec_img = Image.objects.filter(id=previous_image_id)[0]
-        rec_input = UserInput.objects.filter(image_name_id=previous_image_id)[0]
+        # get user input
+        rec_input = query_userinput.filter(image_name_id=previous_image_id)[0]
         return rec_img.image_name, rec_input.possibility, rec_input.user_note, rec_input.user_image_output
 
 def remove_invalid_userinput(max_period_h=12):
