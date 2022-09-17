@@ -24,8 +24,8 @@ from tools.common import get_previous_item
 from tools.common import get_a_new_filename
 
 
-max_valid_times = 3     # each image should only be valided less than 3 times.
-max_work_period_h = 12  # when a user get an image, it should be submit results in 12 hours
+max_valid_times = 3     # each image should only be validated less than 3 times.
+max_work_period_h = 12  # when a user get an image, it should be submitted results in 12 hours
 
 from django.utils import timezone as datetime
 import json
