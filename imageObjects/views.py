@@ -15,6 +15,7 @@ from imageObjects.models import Image
 from imageObjects.models import UserInput
 from tools.common import get_one_record_image
 from tools.common import get_one_record_user
+from tools.common import get_user_id
 from tools.common import get_one_record_userInput
 from tools.common import get_available_image
 from tools.common import calculate_user_contribution
@@ -365,6 +366,8 @@ def manuUpdateDatabase(request,user_name):
     # re-calculate some values in imageObjects_image after removing records in "imageObjects_userinput"
 
     logger.info('%s call manuUpdateDatabase ' % user_name)
+    if user_name not in ['huanglingcao']:   # 'huanglingcao' need to be in the database
+        return HttpResponse('rejected: Only invited users are allowed to do this')
 
     # update image_valid_times of each image
     # set image_valid_times some images as 0, if their corresponding input has been remove from "imageObjects_userinput"
@@ -379,3 +382,55 @@ def manuUpdateDatabase(request,user_name):
 
 
     return HttpResponse('success: update image_valid_times for %d images.'%image_count)
+
+
+def duplicateUserinput(request,user_name):
+    # duplicate userinput records from a specific user: lingcao.huang@colorado.edu
+    # for some results, if a user pretty sure that it is a false positive (not true positive, because there could be some false negative around a true positive)
+    # it's not necessary to ask additional users to validate them
+
+    logger.info('%s call manuUpdateDatabase ' % user_name)
+    if user_name not in ['huanglingcao','huanglingcao@link.cuhk.edu.hk','huanglingcao@gmail.com']:  # these two users need to be in the database
+        return HttpResponse('rejected: Only invited users are allowed to do this')
+
+    # copy input from this user
+    ref_user_name = 'lingcao.huang@colorado.edu'
+    # ref_user_name = 'test1'       # test on my laptop
+    ref_user_id = get_user_id(ref_user_name)
+
+    user_name_for_copy = ['huanglingcao@link.cuhk.edu.hk','huanglingcao@gmail.com']
+
+    q_ref_user_input = UserInput.objects.filter(user_name_id = ref_user_id).filter(possibility = 'no')
+    logger.info('%s inputs with possibility is no: %d records'%(ref_user_name,len(q_ref_user_input)))
+
+    for copy_user in user_name_for_copy:
+        user_rec, b_success  = get_one_record_user(copy_user)
+        if b_success is False:
+            return user_rec
+
+        copy_count = 0
+        for idx, ref_rec in enumerate(q_ref_user_input):
+            # if ref user edit or add something, then don't copy
+            if ref_rec.user_image_output != None:
+                continue
+
+            image_rec = Image.objects.get(id=ref_rec.image_name_id)
+            if image_rec.image_valid_times + image_rec.concurrent_count < max_valid_times:
+                user_inpu_rec = UserInput(user_name=user_rec, image_name=image_rec,
+                                          init_time=datetime.now(), save_time=datetime.now(),
+                                            possibility=ref_rec.possibility,
+                                            user_note = 'copy from %s'%ref_user_name)
+                user_inpu_rec.save()
+                # updated one record for images
+                with transaction.atomic():
+                    image_rec_update = Image.objects.select_for_update().get(id=ref_rec.image_name_id)
+                    image_rec_update.image_valid_times += 1
+                    image_rec_update.concurrent_count = max(image_rec_update.concurrent_count - 1, 0)
+                    image_rec_update.save()
+
+                copy_count += 1
+
+        logger.info('copy %d records from %s to %s' % (copy_count, ref_user_name, copy_user))
+
+
+    return HttpResponse('copy user input ok! See log for more information')
