@@ -10,6 +10,10 @@ from django.db import transaction
 
 import imageObjects.views as  views
 
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+import json
+
 def get_one_record_image(image_name):
     # query = Image.objects.get(image_name=image_name)    # will raise DoesNotExist if not exist
     query = Image.objects.filter(image_name=image_name)  #
@@ -93,6 +97,17 @@ def get_available_image(user_name=None,max_valid_times = 3 ):
     sel_query = [ item for item in query if item.image_valid_times + item.concurrent_count < max_valid_times ]
     if len(sel_query) < 1:
         return None
+
+    # select image_name within a list, which need this user to validate
+    task_file = os.path.join(BASE_DIR,'data','user_tasks','%s.json'%user_name)
+    if os.path.isfile(task_file):
+        with open(task_file) as f_obj:
+            task_dict = json.load(f_obj)
+            image_names = task_dict['image_names']
+            for q in sel_query:
+                if q.image_name in image_names:
+                    return q.image_name
+            return None
 
     return sel_query[0].image_name
 
