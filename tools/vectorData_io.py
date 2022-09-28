@@ -21,10 +21,11 @@ def get_centroid_imagebound_latlon(bound_path):
     geo_pd = read_a_vector_file(bound_path)
     # print(geo_pd.crs)
     # reproject
-    if gpd.__version__ >= '0.7.0':
-        geo_pd = geo_pd.to_crs('EPSG:4326')
-    else:
-        geo_pd  = geo_pd.to_crs({'init':'EPSG:4326'})
+    geo_pd = geo_pd.to_crs('EPSG:4326') # now, gpd.__version__ >= '0.7.0'
+    # if gpd.__version__ >= '0.7.0':
+    #     geo_pd = geo_pd.to_crs('EPSG:4326')
+    # else:
+    #     geo_pd  = geo_pd.to_crs({'init':'EPSG:4326'})
     polygons = geo_pd.geometry.values
     # should only have one
     if len(polygons) != 1:
