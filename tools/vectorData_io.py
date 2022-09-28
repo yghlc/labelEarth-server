@@ -32,5 +32,19 @@ def get_centroid_imagebound_latlon(bound_path):
         raise ValueError('multiple polgyons in %s'%bound_path)
     return get_polygon_centroid(polygons[0])
 
+
+def read_polygons_latlon(file_path):
+    geo_pd = read_a_vector_file(file_path)
+    geo_pd = geo_pd.to_crs('EPSG:4326')
+    polygons = geo_pd.geometry.values
+    return polygons
+
+def read_polygons_epsg3413(file_path):
+    geo_pd = read_a_vector_file(file_path)
+    geo_pd = geo_pd.to_crs('EPSG:3413')
+    polygons = geo_pd.geometry.values
+    return polygons
+
+
 if __name__ == '__main__':
     pass
