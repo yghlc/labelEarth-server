@@ -107,6 +107,7 @@ def get_available_image(user_name=None,max_valid_times = 3 ):
             for q in sel_query:
                 if q.image_name in image_names:
                     return q.image_name
+            views.logger.info('All tasks assigned to %s have been completed'%user_name)
             return None
 
     return sel_query[0].image_name
