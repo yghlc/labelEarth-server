@@ -68,6 +68,7 @@ def save_image_names_to_json(user_name, save_image_names, ext_shp):
 def main(options, args):
     ext_shp = args[0]
     user_name = options.user_name if options.user_name is not None else 'user'
+    user_name = user_name.lower()   # change to lower cases
 
     # get images in data
     image_names, image_paths, image_Bounds, image_object_paths = read_image_list()
