@@ -119,7 +119,14 @@ def get_previous_item(user_name,current_image):
         return None, None, None,None
     current_image_id = get_image_id(current_image)
     if current_image_id is None:
-        return None, None, None,None
+        # try to get the last image this user contributed
+        # order_by('id') is sorted ascending, if want descending, add - in front of the field name
+        query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None).order_by('id')
+        if len(query_userinput) < 1:
+            return None, None, None,None
+        else:
+            rec = query_userinput[0]
+            return rec.image_name, rec.possibility, rec.user_note, rec.user_image_output
 
     # all valid input (possibility!=None) from the user
     query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None)
