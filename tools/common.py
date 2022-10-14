@@ -125,8 +125,9 @@ def get_previous_item(user_name,current_image):
         if len(query_userinput) < 1:
             return None, None, None,None
         else:
-            rec = query_userinput[0]
-            return rec.image_name, rec.possibility, rec.user_note, rec.user_image_output
+            rec_input = query_userinput[len(query_userinput)-1] # the last one
+            rec_img = Image.objects.filter(id=rec_input.image_name_id)[0]
+            return rec_img.image_name, rec_input.possibility, rec_input.user_note, rec_input.user_image_output
 
     # all valid input (possibility!=None) from the user
     query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None)
