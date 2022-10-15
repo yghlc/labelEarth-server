@@ -129,8 +129,17 @@ def get_previous_item(user_name,current_image):
             rec_img = Image.objects.filter(id=rec_input.image_name_id)[0]
             return rec_img.image_name, rec_input.possibility, rec_input.user_note, rec_input.user_image_output
 
-    # all valid input (possibility!=None) from the user
-    query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None)
+    # only view some files validated by this user, not all
+    view_file = os.path.join(BASE_DIR,'data','user_view','%s.json'%user_name)
+    if os.path.isfile(view_file):
+        with open(view_file) as f_obj:
+            view_dict = json.load(f_obj)
+            view_image_names = view_dict['image_names']
+            view_image_ids = [get_image_id(item) for item in view_image_names]
+            query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None).filter(image_name_id__in=view_image_ids)
+    else:
+        # all valid input (possibility!=None) from the user
+        query_userinput = UserInput.objects.filter(user_name_id=user_name_id).exclude(possibility=None)
     if len(query_userinput) < 1:
         return None, None, None,None
 
