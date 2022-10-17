@@ -80,8 +80,8 @@ def statistics_validate_progress(image_table,input_table):
         f_obj.writelines('%d images have been validated more than %d times\n' % (unexpected_count, max_valid_times))
 
         # base on the statistics of input table
-        f_obj.writelines('\n\n based on Input table after filtering, have got %d input from users, progress: %.4f percent \n' %
-            (sum(id_repeat_times), sum(id_repeat_times) * 100.0 / (image_count * max_valid_times)))
+        f_obj.writelines('\n\n\nbased on Input table after filtering (remove %d ones), have got %d input from users, progress: %.4f percent \n' %
+            (rm_count, sum(id_repeat_times), sum(id_repeat_times) * 100.0 / (image_count * max_valid_times)))
         for k in sorted(set(id_repeat_times)):
             f_obj.writelines('%d images have been validated %d times\n' % (id_repeat_times.count(k), k))
 
