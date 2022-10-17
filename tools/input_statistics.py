@@ -41,7 +41,7 @@ def statistics_input_from_each_user(user_table, input_table):
         table_pd.to_excel(writer) # sheet_name='training parameter and results'
     print('save to %s'%os.path.abspath(save_path))
 
-def statistics_validate_progress(image_table):
+def statistics_validate_progress(image_table,input_table):
     image_valid_times_list = image_table['image_valid_times'].to_list()
     image_count = len(image_valid_times_list)
 
@@ -56,6 +56,19 @@ def statistics_validate_progress(image_table):
         total_input_count += count*k
     unexpected_count = image_count - check_image_count  # the number of images be validated for more than "max_valid_times(=3)"
 
+    # statistics from the input table
+    image_id_list = input_table['image_name']
+    user_note_list = input_table['user_note']
+    rm_count = 0
+    new_image_id_list = []
+    for img_id, user_note in zip(image_id_list,user_note_list):
+        if user_note == 'copy from lingcao.huang@colorado.edu':
+            rm_count += 1
+            continue
+        new_image_id_list.append(img_id)
+    unique_ids = set(new_image_id_list)
+    id_repeat_times = [new_image_id_list.count(item) for item in unique_ids]
+
     save_path = 'validate_progress_statistics_%s.txt' % datetime.now().strftime('%Y%m%d-%H%M%S')
     with open(save_path,'w') as f_obj:
         f_obj.writelines('total image count: %d, each need to be validated %d time, have got %d input from users, progress: %.4f percent \n'%
@@ -65,6 +78,12 @@ def statistics_validate_progress(image_table):
             f_obj.writelines('%d images have been validated %d times\n'%(valid_time_img_count[k],k))
 
         f_obj.writelines('%d images have been validated more than %d times\n' % (unexpected_count, max_valid_times))
+
+        # base on the statistics of input table
+        f_obj.writelines('\n\n based on Input table after filtering, have got %d input from users, progress: %.4f percent \n' %
+            (sum(id_repeat_times), sum(id_repeat_times) * 100.0 / (image_count * max_valid_times)))
+        for k in sorted(set(id_repeat_times)):
+            f_obj.writelines('%d images have been validated %d times\n' % (id_repeat_times.count(k), k))
 
     print('save to %s' % os.path.abspath(save_path))
 
@@ -82,7 +101,7 @@ def main():
 
     # statistics and save results
     statistics_input_from_each_user(user_table,input_table)
-    statistics_validate_progress(image_table)
+    statistics_validate_progress(image_table,input_table)
 
 if __name__ == '__main__':
     main()
